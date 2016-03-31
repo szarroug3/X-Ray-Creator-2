@@ -2,8 +2,8 @@
 
 import os
 import urllib
+import subprocess
 import json as m_json
-from subprocess import call
 from shutil import rmtree
 from mobi.mobi import Mobi
 
@@ -11,9 +11,9 @@ class MobiBook(object):
     def __init__(self, filename):
         self.bookLocation = filename
 
-    def __del__(self):
-        if os.path.exists(self.tempDir):
-            rmtree(self.tempDir, ignore_errors=True)
+    # def __del__(self):
+    #     if os.path.exists(self.tempDir):
+    #         rmtree(self.tempDir, ignore_errors=True)
 
     @property
     def bookLocation(self):
@@ -63,8 +63,12 @@ class MobiBook(object):
     def UnpackBook(self):
         if not os.path.exists(self.tempDir):
             os.makedirs(self.tempDir)
-        call(['python', os.path.join(os.path.dirname(__file__), 'KindleUnpack', 'kindleunpack.py'), self.bookLocation, self.tempDir])
-
+        subprocess.Popen(['python',
+            os.path.join(os.path.dirname(__file__), 'KindleUnpack', 'kindleunpack.py'),
+            self.bookLocation,
+            self.tempDir,
+            '-r'], 
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         #find HTML book
         for root, dirs, files in os.walk(self.tempDir):
             if 'book.html' in files:
@@ -102,12 +106,19 @@ class MobiBook(object):
 
     # Update ASIN in book using mobi2mobi
     def updateASIN(self):
+        #remove extra file if it exists
+        if os.path.exists(self.bookLocation + '_NEW'):
+            os.remove(self.bookLocation + '_NEW')
+
+        #create new file with updated ASIN
         mobi2mobi_path = os.path.join(os.path.dirname(__file__), 'MobiPerl', 'mobi2mobi.exe')
-        print mobi2mobi_path, "\"" + self.bookLocation + "\"", '--outfile ' + "\"" + self.bookLocation + "_NEW\"", '--exthtype asin', '--exthdata ' + self.ASIN
-        call([mobi2mobi_path,
-            "\"" + self.bookLocation + "\"",
-            '--outfile "' + self.bookLocation + '_NEW"',
-            '--exthtype asin',
-            '--exthdata ' + self.ASIN])
-        #os.remove(self.bookLocation)
-        #os.rename(self.bookLocation + "_NEW", self.bookLocation)
+        subprocess.Popen([mobi2mobi_path,
+            self.bookLocation,
+            '--outfile', self.bookLocation + '_NEW',
+            '--exthtype', 'asin',
+            '--exthdata', self.ASIN],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+
+        #remove old file, rename new file to old filename
+        os.remove(self.bookLocation)
+        os.rename(self.bookLocation + "_NEW", self.bookLocation)
