@@ -1,19 +1,20 @@
 # MobiBook.py
 
 import os
-import urllib
+from urllib import urlopen, urlencode
 import subprocess
 import json as m_json
 from shutil import rmtree
+from bs4 import BeautifulSoup
 from mobi.mobi import Mobi
+from shelfari.shelfariInfo import ShelfariInfo
 
 class MobiBook(object):
     def __init__(self, filename):
         self.bookLocation = filename
 
-    # def __del__(self):
-    #     if os.path.exists(self.tempDir):
-    #         rmtree(self.tempDir, ignore_errors=True)
+    def __del__(self):
+        rmtree(self.tempDir, ignore_errors=True)
 
     @property
     def bookLocation(self):
@@ -23,20 +24,21 @@ class MobiBook(object):
     def bookLocation(self, filename):
         if type(filename) == str:
             self._bookLocation = os.path.abspath(filename)
-            self._bookName = os.path.splitext(os.path.basename(self.bookLocation))[0]
-            self._xrayLocation = os.path.join(os.path.dirname(self.bookLocation), self.bookName + ".sdr")
-            self._tempDir = os.path.join(os.getcwd(), "temp", self.bookName)
+            self._bookFileName = os.path.splitext(os.path.basename(self.bookLocation))[0]
+            self._xrayLocation = os.path.join(os.path.dirname(self.bookLocation), self.bookFileName + ".sdr")
+            self._tempDir = os.path.join(os.getcwd(), "temp", self.bookFileName)
             self._bookConfig = self.GetBookConfig()
+            self._bookName = self.bookConfig['mobi']['Full Name']
         else:
             raise TypeError("Expected string, got " + str(type(filename)))
 
     @property
-    def bookName(self):
-        return self._bookName
-
-    @property
     def xrayLocation(self):
         return self._xrayLocation
+
+    @property
+    def bookFileName(self):
+        return self._bookFileName
 
     @property
     def tempDir(self):
@@ -47,13 +49,20 @@ class MobiBook(object):
         return self._bookConfig
 
     @property
+    def bookName(self):
+        return self._bookName
+
+    @property
     def htmlBook(self):
         return self._htmlBook
 
     @property
     def ASIN(self):
         return self._ASIN
-    
+
+    @property
+    def shelfariURL(self):
+        return self._shelfariURL
     
     def GetBookConfig(self):
         book = Mobi(self.bookLocation)
@@ -66,8 +75,7 @@ class MobiBook(object):
         subprocess.Popen(['python',
             os.path.join(os.path.dirname(__file__), 'KindleUnpack', 'kindleunpack.py'),
             self.bookLocation,
-            self.tempDir,
-            '-r'], 
+            self.tempDir], 
             stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         #find HTML book
         for root, dirs, files in os.walk(self.tempDir):
@@ -75,10 +83,10 @@ class MobiBook(object):
                 self._htmlBook = os.path.join(root, 'book.html')
 
     # Get ASIN from Amazon
-    def getASIN(self):
+    def GetASIN(self):
         self._ASIN = -1
-        query = urllib.urlencode ( { 'q' : "amazon kindle \"ebook\" " + self.bookName } )
-        response = urllib.urlopen ( 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query).read()
+        query = urlencode ( { 'q' : "amazon kindle \"ebook\" " + self.bookName } )
+        response = urlopen ( 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query).read()
         json = m_json.loads ( response )
         results = json [ 'responseData' ] [ 'results' ]
         for result in results:
@@ -88,13 +96,11 @@ class MobiBook(object):
                 if "/dp/" in url:
                     index = url.find("/dp/")
                     ASIN = url[index + 4 : index + 14]
-                    print "Found book on amazon..."
-                    print "ASIN: " + ASIN
                     self._ASIN = ASIN
                     return
                 else:
                     for i in range(10):
-                        amazon_page = urllib.urlopen(url)
+                        amazon_page = urlopen(url)
                         page_source = amazon_page.read()
                         index = page_source.find("ASIN.0")
                         if index > 0:
@@ -105,7 +111,7 @@ class MobiBook(object):
                             return
 
     # Update ASIN in book using mobi2mobi
-    def updateASIN(self):
+    def UpdateASIN(self):
         #remove extra file if it exists
         if os.path.exists(self.bookLocation + '_NEW'):
             os.remove(self.bookLocation + '_NEW')
@@ -122,3 +128,15 @@ class MobiBook(object):
         #remove old file, rename new file to old filename
         os.remove(self.bookLocation)
         os.rename(self.bookLocation + "_NEW", self.bookLocation)
+
+    # Searches for shelfari url for book
+    def GetShelfariInfo(self):
+        response = urlopen ( 'http://www.shelfari.com/search/books?Keywords=' + self.ASIN ).read()
+        page_source = BeautifulSoup(response, "html.parser")
+        for link in page_source.find_all("a"):
+            url = link.get('href')
+            if "http://www.shelfari.com/books/" in url and url.count('/') == 5:
+                shelfari_id = url[30:url[30:].find('/') + 30]
+                if shelfari_id.isdigit():
+                    self._shelfariURL = url
+                    return

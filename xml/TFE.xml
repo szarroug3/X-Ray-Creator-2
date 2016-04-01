@@ -1,0 +1,660 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfTerm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Term>
+    <Type>character</Type>
+    <name>Vin</name>
+    <Desc>A half-skaa street urchin who unknowingly possesses the power of a Mistborn. Primary protagonist.  Vulnerable, but strong.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Kelsier</name>
+    <Desc>The Survivor of Hathsin, and one of the greatest Mistborn Allomancers of all time. He escaped from the Pits of Hathsin where he had been forced to work as a slave, and wandered the world. After being contacted by a skaa hoping for rebellion, Kelsier strikes up his loyal crew with a new contract: the fall of the Final Empire. Secondary protagonist - the story is partly told from his point of view.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Dockson</name>
+    <Desc>aka Dox. Kelsier's long time friend and crewmember. He is not an Allomancer, but keeps the crew operational by means of his organizational and administrative abilities.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Hammond</name>
+    <Desc>aka Ham. A member of Kelsier's crew, and a Pewterarm or Thug. Ham enjoys philosophical bouts, especially with Breeze.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Ladrian</name>
+    <Desc>aka Breeze. A member of Kelsier's crew, and a Soother. Breeze likes his wine, almost as much as he likes himself.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Cladent</name>
+    <Desc>aka Clubs. A member of Kelsier's crew. He is a Coppercloud or Smoker, and he along with the rest of his apprentices are able to shield their hideouts from the Ministry's Allomancers.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lestibournes</name>
+    <Desc>aka Spook. One of Clubs' apprentices, and a Tineye. He hails from the east, and as such speaks with a strange dialect.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lord Ruler</name>
+    <Desc>The ruler and "God" of the Final Empire. Nobody knows who he is or where he came from. All that is known is that since his Ascension, the Deepness was driven back and the world has lost hope.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Marsh</name>
+    <Desc>Kelsier's brother and a Seeker. He is willing to take down the Final Empire, no matter the cost.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Sazed</name>
+    <Desc>A Terrisman steward to Lord Renoux, and then Vin.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Elend Venture</name>
+    <Desc>aka El. A nobleman, and son of Straff Venture. He is heir to the Venture House, though not by the choice of either him nor his father. All Elend wants to do is read, philosophize and antagonize his father</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Teven Renoux</name>
+    <Desc>A nobleman who is part of Kelsier's crew.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Reen</name>
+    <Desc>Vin's older brother</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Shan Elariel</name>
+    <Desc>a wealthy Lutharian noblewoman from the Elariel House.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Camon</name>
+    <Desc>crewleader for a band of thieves</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Jastes Lekal</name>
+    <Desc>friend of Elend. From House Lekal.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Milev</name>
+    <Desc>Camon's second.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Kar</name>
+    <Desc>an Inquisitor.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Theron</name>
+    <Desc>Skaa theiving crew leader. Colludes with Camon for the scheme at the beginning of the book.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Mare</name>
+    <Desc>Kelsier's wife who was killed in the Pits of Hathsin, a Tineye.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Rashek</name>
+    <Desc>A historical Terris packman.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Prelan Tevidian</name>
+    <Desc>An obligator. Lord Prelan of one of the Ministries.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>OreSeur</name>
+    <Desc>a Kandra</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>TenSoon</name>
+    <Desc>The Venture family kandra.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lord Thomas Tresting</name>
+    <Desc>Nobleman and lord of Tresting plantation.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Kurdon</name>
+    <Desc>Burly taskmaster for Lord Tresting</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Goodman Tepper</name>
+    <Desc>Skaa elder</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Goodman Mennis</name>
+    <Desc>skaa elder on the Tresting plantation</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Ulef</name>
+    <Desc>A member in Camon's band of thieves. Young and gangly.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lord Straff Venture</name>
+    <Desc>Head of house Venture. Elend's father.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Prelan Laird</name>
+    <Desc>an obliagator. Senior bureaucrat in the Ministry's Canton of Finance.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Yeden</name>
+    <Desc>A revolutionary.  Hires Kelsier to build him an army.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Hign prelan Arriev</name>
+    <Desc>from the ministry of Finance.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Disten</name>
+    <Desc>A member of Camon's crew.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Gemmel</name>
+    <Desc>A mentor of Kelsier, taught him about iron pulling and steel pushing.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lord Rian Strobe</name>
+    <Desc>First noble to ask Vin (Valette) to dance.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lord Telden Hasting</name>
+    <Desc>One of Elend's friends.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lady Kliss</name>
+    <Desc>A socialite prone to gossip.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lord Entrone</name>
+    <Desc />
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Ardous Geffenry</name>
+    <Desc />
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Callins Geffenry</name>
+    <Desc />
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Bendal</name>
+    <Desc>A steel inquisitor</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lord Idren Seeris</name>
+    <Desc>cousin to house Elariel</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>character</Type>
+    <name>Lord Tegas</name>
+    <Desc>Possible ally of house Venture.  Has a daughter that Straff would like to match up with Elend.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>The Pits of Hathsin</name>
+    <Desc>A place where Skaa criminals are sent to work.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Khlennium</name>
+    <Desc />
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Mansion Renoux</name>
+    <Desc>Home of House Renoux, located in the city of Fellise.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Western Dominance</name>
+    <Desc>Fadrex City is an important cross roads city in the Western Dominance. Although all cities outside of Luthadel are forbidden from having walls, Fadrex City has a natural rock formation that makes it very defensible.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Northern Dominance</name>
+    <Desc>Urteau is a key crossroads city in the Northern Dominance. It was the traditional seat of House Venture although the family is based mainly in the capital.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Terris Dominance</name>
+    <Desc>Terris is the ancestral home of the Terrismen. It is a mountainous region located north of the Northern Dominance. The Terris Dominance is the only Dominance to retain its original name.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Central Dominance</name>
+    <Desc>Luthadel is the capital of the Central Dominance and the entire Final Empire. Luthadel is the heart of the Lord Ruler's power, as well as the site of his palace, Kredik Shaw.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Allomancy</name>
+    <Desc>The process of burning metals.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Allomancer</name>
+    <Desc>A person able to burn one or all of the Allomantic metals.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Allomantic metals</name>
+    <Desc>Eight basic Allomantic metals are iron, steel, tin, pewter, brass, zinc, copper and bronze. The ninth Allomantic metal is gold. The tenth Allomantic metal is Atium. There is rumored to be an eleventh and maybe even twelfth Allomantic metal (names for these are not mentioned in the novel).</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Brass</name>
+    <Desc>External mental pulling metal. A person using this metal is able to Soothe another person's emotions, dampening them and making particular emotions less powerful.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Bronze</name>
+    <Desc>Internal mental pushing metal. A person burning this metal is able to sense when nearby people are using Allomancy</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Coinshot</name>
+    <Desc>A Misting who can burn steel.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Copper</name>
+    <Desc>Internal mental pulling metal. A person burning copper gives off an invisible cloud that protects anyone inside of it from the senses of a Seeker.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Lurcher</name>
+    <Desc>A Misting who can burn iron.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Mistborn</name>
+    <Desc>An Allomancer able to use all Allomantic metals.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Misting</name>
+    <Desc>An Allomancer able to use only one of the Allomantic metals.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Pewter</name>
+    <Desc>Internal physical pushing metal. A person burning pewter enhances the physical attributes of their body.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Pewterarm</name>
+    <Desc>A Misting who can burn Pewter.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Iron</name>
+    <Desc>External physical pulling metal. A person burning iron can see translucent blue lines pointing to nearby sources of metal.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Rioter</name>
+    <Desc>A Misting who can burn zinc.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Seeker</name>
+    <Desc>A Misting who can burn bronze.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Smoker</name>
+    <Desc>A Misting who can burn copper.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Soother</name>
+    <Desc>A Misting who can burn brass.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Steel</name>
+    <Desc>External physical pushing metal. A person burning iron can see translucent blue lines pointing to nearby sources of metal.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Tin</name>
+    <Desc>Internal physical pulling metal. A person burning tin gains enhanced senses.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Tineye</name>
+    <Desc>A Misting who can burn tin.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Thug</name>
+    <Desc>A misting who can burn pewter, aka Pewterarm.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+  <Term>
+    <Type>topic</Type>
+    <name>Zinc</name>
+    <Desc>External mental pushing metal. A person burning zinc can Riot another person's emotions, inflaming them and making particular emotions more powerful.</Desc>
+    <src>shelfari</src>
+    <url>http://www.shelfari.com/books/51683/Mistborn</url>
+    <MatchCase>false</MatchCase>
+    <Match>true</Match>
+  </Term>
+</ArrayOfTerm>
