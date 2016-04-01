@@ -8,14 +8,18 @@ book = MobiBook("test\TFE.mobi")
 book.GetASIN()
 book.UpdateASIN()
 book.GetShelfariInfo()
+
 app = Application.start("C:\Users\szarroug3\Documents\X-Ray Builder GUI\X-Ray Builder GUI.exe")
 
 mainWindow = app['X-Ray Builder GUI']
 aliasesWindow = app['Aliases']
 chaptersWindow = app['Chapters']
 
-mainWindow['Edit1'].TypeKeys(book.bookLocation)
-mainWindow['Edit2'].TypeKeys(book.shelfariURL)
+#minimize app
+mainWindow.Minimize()
+
+mainWindow['Edit1'].SetEditText(book.bookLocation)
+mainWindow['Edit2'].SetEditText(book.shelfariURL)
 mainWindow['Button6'].Click()	#make sure Source is Shelfari
 mainWindow['Button11'].Click()	#create xray button
 
