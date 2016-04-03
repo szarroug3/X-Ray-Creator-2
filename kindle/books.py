@@ -30,6 +30,9 @@ class Books(object):
             string += str(book) + '\n'
         return string[:-1]
 
+    def __len__(self):
+        return len(self.books)
+
     @property
     def kindleDrive(self):
         return self._kindleDrive
@@ -88,7 +91,9 @@ class Books(object):
 
     def PrintListOfBooks(self):
         for book in self.books:
-            print '\t%i. %s' % (book.bookID, book.bookFileName)
+            print '%i. ' % book.bookID,
+            if book.author: print '%s - ' % book.author,
+            print '%s' % book.bookFileName
 
     def RemoveBooksWithXray(self):
         for book in self.books:
@@ -102,10 +107,12 @@ class Books(object):
                 booksToUpdate.append(book)
         return booksToUpdate
 
-    def GetBookByASIN(self, ASIN):
+    def GetBookByASIN(self, ASIN, onlyCheckUpdated=True):
         for book in self.books:
-            if book.ASIN == ASIN:
-                return book
+            if (onlyCheckUpdated and book.update) or not onlyCheckUpdated:
+                print book.ASIN, ASIN
+                if book.ASIN == ASIN:
+                    return book
 
 class KindleNotFound(Exception):
     pass

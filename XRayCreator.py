@@ -1,6 +1,7 @@
 # XRayCreator.py
 
 import os
+import sys
 import argparse
 from kindle.books import Books
 from time import sleep
@@ -21,11 +22,14 @@ def Update():
     books = books.replace(" ", "")
     books = books.split(',')
     for bookID in books:
-        book = kindleBooks.books[int(bookID) - 1]
-        MarkForUpdate(book)
-        if book.xrayExists:
-            for xrayFile in glob(os.path.join(book.xrayLocation, '*.asc')):
-                os.remove(xrayFile)
+        if  int(bookID) <= len(kindleBooks):
+            book = kindleBooks.books[int(bookID) - 1]
+            MarkForUpdate(book)
+            if book.xrayExists:
+                for xrayFile in glob(os.path.join(book.xrayLocation, '*.asc')):
+                    os.remove(xrayFile)
+        else:
+            print "Skipping book number %s as it is not in the list." % bookID
 
 def New():
     for book in kindleBooks:
@@ -49,6 +53,9 @@ if args.update: numOfArgs += 1
 if args.new: numOfArgs += 1
 if numOfArgs > 1:
     raise Exception('Please choose only one argument.')
+if numOfArgs < 1:
+    parser.print_help()
+    sys.exit()
 
 kindleBooks = Books()
 if args.updateall:
@@ -57,8 +64,6 @@ elif args.update:
     Update()
 elif args.new:
     New()
-else:
-    parser.print_help()
 
 booksToUpdate = kindleBooks.GetBooksToUpdate()
 if len(booksToUpdate) > 0:
@@ -76,8 +81,7 @@ if len(booksToUpdate) > 0:
 
     #Get output directory
     mainWindow['Button3'].Click()
-    while not settingsWindow.Exists():
-        sleep(.5)
+    settingsWindow.Wait('exists', timeout=60)
     outputDir = settingsWindow['Edit4'].Texts()[0]
     settingsWindow['Button23'].Click()
 
@@ -99,20 +103,18 @@ if len(booksToUpdate) > 0:
         mainWindow['Button11'].Click()  #click create xray button
 
         #wait for aliases window
-        while not aliasesWindow.Exists():
-            sleep(1)
+        aliasesWindow.Wait('exists', timeout=60)
         aliasesWindow['No'].Click()
 
         #wait for chapters window
-        while not chaptersWindow.Exists():
-            sleep(1)
+        chaptersWindow.Wait('exists', timeout=60)
         chaptersWindow['No'].Click()
 
         #wait for xray creation to be done
         app.WaitCPUUsageLower(timeout=60)
 
     #close X-Ray Builder GUI
-    app.kill_()
+    #app.kill_()
 
     #move x-ray files to their respective locations
     print 'Moving X-Ray Files to their directories'
@@ -122,9 +124,9 @@ if len(booksToUpdate) > 0:
             xrayFiles.append(file)
     
     for xrayFile in xrayFiles:
-        print xrayFile
-        print okByASIN(os.path.basename(xrayFile).split('.')[1]
-        #move(xrayFile, kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[1]))
+        xrayLoc = kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[2]).xrayLocation
+        if (os.path.exists(xrayLoc)):
+            move(xrayFile, xrayLoc)
 
     for book in booksSkipped:
         print '%s skipped because %s' % (book[0].bookFileName, book[1])
