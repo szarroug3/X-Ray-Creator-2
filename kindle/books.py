@@ -89,11 +89,18 @@ class Books(object):
                     self.books.append(MobiBook(os.path.join(dirName,fName), index))
         print '%i books found.' % index
 
+        print 'Get metadata for books...'
+        for book in self.books:
+            book.GetBookConfig()
+        print "Done getting metadata"
+        print
+
     def PrintListOfBooks(self):
         for book in self.books:
             print '%i. ' % book.bookID,
-            if book.author: print '%s - ' % book.author,
-            print '%s' % book.bookFileName
+            if book.author: print '%s - %s' % (book.author, book.bookName)
+            else: print book.fileName
+        print
 
     def RemoveBooksWithXray(self):
         for book in self.books:
@@ -110,7 +117,6 @@ class Books(object):
     def GetBookByASIN(self, ASIN, onlyCheckUpdated=True):
         for book in self.books:
             if (onlyCheckUpdated and book.update) or not onlyCheckUpdated:
-                print book.ASIN, ASIN
                 if book.ASIN == ASIN:
                     return book
 

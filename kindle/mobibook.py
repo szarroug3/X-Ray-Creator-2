@@ -4,8 +4,9 @@ import os
 from glob import glob
 from urllib import urlopen, urlencode
 import subprocess
-import json as m_json
+from google import search
 from bs4 import BeautifulSoup
+from mobi.mobi import Mobi
 
 class MobiBook(object):
     def __init__(self, filename, bookID):
@@ -16,7 +17,9 @@ class MobiBook(object):
         self._shelfariURL = None
 
     def __str__(self):
-        string = '%i. %s' % (self.bookID, self.bookFileName)
+        string = '%i. ' % self.bookID
+        if self.author: string += '%s - %s' % (self.author, self.bookName)
+        else: string = '%s' % self.bookFileName
         if self.update:
             string += "\n\tMarked for update"
         string +='\n\t%s' % self.bookLocation
@@ -35,10 +38,16 @@ class MobiBook(object):
 
     @bookLocation.setter
     def bookLocation(self, filename):
-        self._bookLocation = os.path.abspath(filename)
-        self._bookFileName = os.path.splitext(os.path.basename(self.bookLocation))[0]
-        self._xrayLocation = os.path.join(os.path.dirname(self.bookLocation), self.bookFileName + ".sdr")
-        self._xrayExists = glob(os.path.join(self.xrayLocation, '*.asc'))
+        if type(filename) == str:
+            if os.path.exists(filename):
+                self._bookLocation = os.path.abspath(filename)
+                self._bookFileName = os.path.splitext(os.path.basename(self.bookLocation))[0]
+                self._xrayLocation = os.path.join(os.path.dirname(self.bookLocation), self.bookFileName + ".sdr")
+                self._xrayExists = glob(os.path.join(self.xrayLocation, '*.asc'))
+            else:
+                raise FileNotFoundError('File %s not found' % filename)
+        else:
+            raise TypeError('Expected string, got ' + str(type(filename)))
 
     @property
     def update(self):
@@ -55,26 +64,31 @@ class MobiBook(object):
     @bookID.setter
     def bookID(self, value):
         self._bookID = value
+    
+    @property
+    def xrayLocation(self):
+        return self._xrayLocation
 
     @property
     def bookFileName(self):
         return self._bookFileName
-    
-    @property
-    def xrayLocation(self):
-        return self._xrayLocation
 
     @property
     def xrayExists(self):
         return self._xrayExists
+
+    @property
+    def bookConfig(self):
+        return self._bookConfig
+
+    @property
+    def author(self):
+        return self._author
     
     @property
-    def xrayLocation(self):
-        return self._xrayLocation
-
-    @xrayLocation.setter
-    def xrayLocation(self, value):
-        self._xrayLocation = value
+    def bookName(self):
+        return self._bookName
+    
 
     @property
     def ASIN(self):
@@ -84,33 +98,28 @@ class MobiBook(object):
     def shelfariURL(self):
         return self._shelfariURL
 
+    def GetBookConfig(self):
+        book = Mobi(self.bookLocation)
+        book.parse()
+        self._bookConfig = book.config
+        self._author = self.bookConfig['exth']['records'][100]
+        if self._author:
+            self._bookName = self.bookConfig['mobi']['Full Name']
+        else:
+            self._bookName = self.bookFileName
+ 
     # Get ASIN from Amazon
     def GetASIN(self):
         self._ASIN = -1
-        query = urlencode ( { 'q' : "amazon kindle \"ebook\" " + self.bookFileName } )
-        response = urlopen ( 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query).read()
-        json = m_json.loads ( response )
-        results = json [ 'responseData' ] [ 'results' ]
-        for result in results:
-            title = result['title']
-            url = result['url']
+        query = 'amazon kindle \"ebook\" %s' % self.bookName
+        if self.author: query += ' %s' % self.author
+        for url in search(query, stop=5):
             if "amazon" in url:
                 if "/dp/" in url:
                     index = url.find("/dp/")
                     ASIN = url[index + 4 : index + 14]
                     self._ASIN = ASIN
                     return
-                else:
-                    for i in range(10):
-                        amazon_page = urlopen(url)
-                        page_source = amazon_page.read()
-                        index = page_source.find("ASIN.0")
-                        if index > 0:
-                            ASIN = page_source[index + 15 : index + 25]
-                            print "Found book on amazon..."
-                            print "ASIN: " + ASIN
-                            self._ASIN = ASIN
-                            return
         raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookFileName)
 
     # Update ASIN in book using mobi2mobi

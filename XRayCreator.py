@@ -6,7 +6,7 @@ import argparse
 from kindle.books import Books
 from time import sleep
 from glob import glob
-from shutil import move
+from shutil import move, rmtree
 from pywinauto import *
 
 def UpdateAll():
@@ -17,7 +17,7 @@ def UpdateAll():
                 os.remove(xrayFile)
 
 def Update():
-    print kindleBooks.PrintListOfBooks()
+    kindleBooks.PrintListOfBooks()
     books = raw_input("Please enter book number(s) of the book(s) you'd like to update in a comma separated list: ")
     books = books.replace(" ", "")
     books = books.split(',')
@@ -38,6 +38,12 @@ def New():
 
 def MarkForUpdate(book):    
     book.update = True
+
+def CleanUp():
+    if os.path.exists('dmp'): rmtree('dmp')
+    if os.path.exists('ext'): rmtree('ext')
+    if os.path.exists('log'): rmtree('log')
+    if os.path.exists('out'): rmtree('out')
 
 #main
 parser = argparse.ArgumentParser(description='Create and update kindle X-Ray files')
@@ -67,10 +73,15 @@ elif args.new:
 
 booksToUpdate = kindleBooks.GetBooksToUpdate()
 if len(booksToUpdate) > 0:
+    CleanUp()
     booksSkipped = []
 
-    #open X-Ray Builder GUI
-    app = Application().start(os.path.join('X-Ray Builder GUI','X-Ray Builder GUI.exe'))
+    #try to connect to X-Ray Builder; if it's not open, open it
+    app = Application()
+    try:
+        app = app['X-Ray Builder GUI']
+    except Exception, e:
+        app = Application().start(os.path.join('X-Ray Builder GUI','X-Ray Builder GUI.exe'))
     mainWindow = app['X-Ray Builder GUI']
     aliasesWindow = app['Aliases']
     chaptersWindow = app['Chapters']
@@ -88,11 +99,10 @@ if len(booksToUpdate) > 0:
     #update books
     for book in booksToUpdate:
         try:
-            print book.bookFileName
+            print book.bookName
             print '\tUpdating ASIN and getting shelfari URL'
             book.GetShelfariURL()
         except Exception as e:
-            raise e
             booksToUpdate.remove(book)
             booksSkipped.append((book, e))
 
@@ -114,21 +124,29 @@ if len(booksToUpdate) > 0:
         app.WaitCPUUsageLower(timeout=60)
 
     #close X-Ray Builder GUI
-    #app.kill_()
+    app.kill_()
 
     #move x-ray files to their respective locations
     print 'Moving X-Ray Files to their directories'
     xrayFiles = []
     for dirName, subDirList, fileList in os.walk(outputDir):
         for file in glob(os.path.join(dirName,'*.asc')):
+            print file
             xrayFiles.append(file)
     
     for xrayFile in xrayFiles:
         xrayLoc = kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[2]).xrayLocation
-        if (os.path.exists(xrayLoc)):
+        if xrayLoc and os.path.exists(xrayLoc):
             move(xrayFile, xrayLoc)
 
     for book in booksSkipped:
-        print '%s skipped because %s' % (book[0].bookFileName, book[1])
+        print '%s skipped because %s' % (book[0].bookName, book[1])
 else:
     print "No books to update."
+
+#clean up
+#delete dmp, ext, log,  out
+print "Cleaning up..."
+CleanUp()
+
+print "Done!"
