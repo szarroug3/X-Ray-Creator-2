@@ -86,20 +86,20 @@ class Books(object):
             for fName in fileList:
                 if ".mobi" in fName:
                     index += 1
-                    self.books.append(MobiBook(os.path.join(dirName,fName), index))
+                    self.books.append(MobiBook(os.path.join(dirName,fName)))
         print '%i books found.' % index
+
 
         print 'Get metadata for books...'
         for book in self.books:
             book.GetBookConfig()
+        self.books.sort(key=lambda x:x.bookNameAndAuthor)
         print "Done getting metadata"
         print
 
     def PrintListOfBooks(self):
-        for book in self.books:
-            print '%i. ' % book.bookID,
-            if book.author: print '%s - %s' % (book.author, book.bookName)
-            else: print book.fileName
+        for bookNum, book in enumerate(self.books, 1):
+            print '%i. %s' % (bookNum, book.bookNameAndAuthor)
         print
 
     def RemoveBooksWithXray(self):

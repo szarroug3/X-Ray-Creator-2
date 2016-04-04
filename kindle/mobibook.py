@@ -9,17 +9,14 @@ from bs4 import BeautifulSoup
 from mobi.mobi import Mobi
 
 class MobiBook(object):
-    def __init__(self, filename, bookID):
+    def __init__(self, filename):
         self.bookLocation = filename
-        self.bookID = bookID
         self.update = False
         self._ASIN = None
         self._shelfariURL = None
 
     def __str__(self):
-        string = '%i. ' % self.bookID
-        if self.author: string += '%s - %s' % (self.author, self.bookName)
-        else: string = '%s' % self.bookFileName
+        string = self.bookNameAndAuthor
         if self.update:
             string += "\n\tMarked for update"
         string +='\n\t%s' % self.bookLocation
@@ -56,14 +53,6 @@ class MobiBook(object):
     @update.setter
     def update(self, value):
         self._update = value
-        
-    @property
-    def bookID(self):
-        return self._bookID
-
-    @bookID.setter
-    def bookID(self, value):
-        self._bookID = value
     
     @property
     def xrayLocation(self):
@@ -88,8 +77,11 @@ class MobiBook(object):
     @property
     def bookName(self):
         return self._bookName
-    
 
+    @property
+    def bookNameAndAuthor(self):
+        return self._bookNameAndAuthor
+    
     @property
     def ASIN(self):
         return self._ASIN
@@ -103,16 +95,16 @@ class MobiBook(object):
         book.parse()
         self._bookConfig = book.config
         self._author = self.bookConfig['exth']['records'][100]
-        if self._author:
-            self._bookName = self.bookConfig['mobi']['Full Name']
+        self._bookName = self.bookConfig['mobi']['Full Name']
+        if self._author and self.bookName:
+            self._bookNameAndAuthor = '%s - %s' % (self.author, self.bookName)
         else:
-            self._bookName = self.bookFileName
+            self._bookNameAndAuthor = self.bookFileName
  
     # Get ASIN from Amazon
     def GetASIN(self):
         self._ASIN = -1
-        query = 'amazon kindle \"ebook\" %s' % self.bookName
-        if self.author: query += ' %s' % self.author
+        query = 'amazon kindle \"ebook\" %s' % self.bookNameAndAuthor
         for url in search(query, stop=5):
             if "amazon" in url:
                 if "/dp/" in url:

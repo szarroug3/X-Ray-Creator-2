@@ -68,15 +68,10 @@ elif args.new:
 
 booksToUpdate = kindleBooks.GetBooksToUpdate()
 if len(booksToUpdate) > 0:
-    CleanUp()
     booksSkipped = []
 
-    #try to connect to X-Ray Builder; if it's not open, open it
-    app = Application()
-    try:
-        app = app['X-Ray Builder GUI']
-    except Exception, e:
-        app = Application().start(os.path.join('X-Ray Builder GUI','X-Ray Builder GUI.exe'))
+    #open X-Ray Builder GUI
+    app = Application().start(os.path.join('X-Ray Builder GUI','X-Ray Builder GUI.exe'))
     mainWindow = app['X-Ray Builder GUI']
     aliasesWindow = app['Aliases']
     chaptersWindow = app['Chapters']
@@ -90,6 +85,7 @@ if len(booksToUpdate) > 0:
     settingsWindow.Wait('exists', timeout=60)
     outputDir = settingsWindow['Edit4'].Texts()[0]
     if os.path.exists(outputDir): rmtree(outputDir)
+    os.mkdir(outputDir)
     settingsWindow['Button23'].Click()
 
     #update books
@@ -147,5 +143,9 @@ if os.path.exists(outputDir): rmtree(outputDir)
 if os.path.exists('dmp'): rmtree('dmp')
 if os.path.exists('ext'): rmtree('ext')
 if os.path.exists('log'): rmtree('log')
+if os.path.exists('.google-cookie'): os.remove('.google-cookie')
+#if os.path.exists(os.path.join('X-Ray Builder GUI', 'dmp')): rmtree(os.path.join('X-Ray Builder GUI', 'dmp'))
+if os.path.exists(os.path.join('X-Ray Builder GUI', 'log')): rmtree(os.path.join('X-Ray Builder GUI', 'log'))
+if os.path.exists(os.path.join('X-Ray Builder GUI', 'out')): rmtree(os.path.join('X-Ray Builder GUI', 'out'))
 
 print "Done!"
