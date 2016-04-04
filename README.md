@@ -1,5 +1,8 @@
 # X-Ray-Creator-2
 
+Original X-Ray Builder by Ephemerality (http://www.mobileread.com/forums/showthread.php?t=245754)
+Original Mobi Metadata Editor By Gluggy (http://www.mobileread.com/forums/showthread.php?t=165729)
+
 Requirements:
 	* Python packages: Google, Pywinauto
 	* You must open X-Ray Builder GUI at least once to close out the one time
