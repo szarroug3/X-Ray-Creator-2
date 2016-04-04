@@ -5,9 +5,11 @@ import sys
 import argparse
 import re
 from kindle.books import Books
+from kindle.customexceptions import *
 from time import sleep
 from glob import glob
 from shutil import move, rmtree
+from time import sleep
 from pywinauto import *
 
 def UpdateAll():
@@ -50,6 +52,22 @@ def New():
 def MarkForUpdate(book):    
     book.update = True
 
+def CreateXRayFile(book):
+    print '\tCreating X-Ray file'
+    xrayButton.Click()  #click create xray button
+
+    #wait for aliases window
+    app.WaitCPUUsageLower(threshold=.5, timeout=300)
+    aliasesWindow.Wait('exists', timeout=30)
+    aliasesNoButton.Click()
+
+    #wait for chapters window
+    app.WaitCPUUsageLower(threshold=.5, timeout=300)
+    chaptersWindow.Wait('exists', timeout=5)
+    chaptersNoButton.Click()
+
+    #wait for xray creation to be done
+    app.WaitCPUUsageLower(threshold=.5, timeout=300)
 
 #main
 parser = argparse.ArgumentParser(description='Create and update kindle X-Ray files')
@@ -79,6 +97,7 @@ elif args.new:
 
 booksToUpdate = kindleBooks.GetBooksToUpdate()
 if len(booksToUpdate) > 0:
+    booksUpdated = []
     booksSkipped = []
 
     #open X-Ray Builder GUI
@@ -88,62 +107,89 @@ if len(booksToUpdate) > 0:
     chaptersWindow = app['Chapters']
     settingsWindow = app['Settings']
 
+    #get buttons
+    buttons = [button for button in mainWindow._ctrl_identifiers() if type(button) is controls.win32_controls.ButtonWrapper]
+    buttons.sort(key=lambda x:x.Rectangle().left)
+    xrayButton = buttons[6]
+    sheflariURLButton = buttons[2]
+    settingsButton = buttons[10]
+    settingsSaveButton = settingsWindow['SaveButton']
+    shelfariButton = mainWindow['ShelfariButton']
+    aliasesNoButton = aliasesWindow['No']
+    chaptersNoButton = chaptersWindow['No']
+
+    #get text boxes
+    textBoxes = [box for box in mainWindow._ctrl_identifiers() if type(box) is controls.win32_controls.EditWrapper]
+    textBoxes.sort(key=lambda x:x.Rectangle().top)
+    bookTextBox = textBoxes[0]
+    shelfariURLTextBox = textBoxes[1]
+    outputTextBox = textBoxes[2]
+
     #minimize window
     #mainWindow.Minimize()
 
     #Get output directory
-    mainWindow['Button3'].Click()
+    settingsButton.Click()
     settingsWindow.Wait('exists', timeout=60)
-    outputDir = settingsWindow['Edit4'].Texts()[0]
+    outputDir = settingsWindow['Output Directory:Edit'].Texts()[0]
+    settingsSaveButton.Click()
+    app.WaitCPUUsageLower(threshold=.5, timeout=300)
+    shelfariButton.Click()   #make sure Source is Shelfari
     if os.path.exists(outputDir): rmtree(outputDir)
     os.mkdir(outputDir)
-    settingsWindow['Button23'].Click()
 
     #update books
     for book in booksToUpdate:
         try:
-            print book.bookName
+            print book.bookNameAndAuthor
+            while not bookTextBox.IsEnabled():
+                sleep(1)
+            bookTextBox.SetEditText(book.bookLocation)
             print '\tUpdating ASIN and getting shelfari URL'
             book.GetShelfariURL()
-        except Exception as e:
-            booksToUpdate.remove(book)
+            shelfariURLTextBox.SetEditText(book.shelfariURL)
+            CreateXRayFile(book)
+            booksUpdated.append(book)
+        except CouldNotFindShelfariURL:
+            try:
+                print '\tMaking X-Ray Builder GUI get shelfari URL'
+                sheflariURLButton.Click()
+                #wait for it to finish getting url
+                app.WaitCPUUsageLower(threshold=.5, timeout=300)
+                CreateXRayFile(book)
+                booksUpdated.append(book)
+            except Exception, e:
+                print '\t1 - %s' % repr(e)
+                booksSkipped.append((book, e))
+        except Exception, e:
+            print '\t2 - %s' % repr(e)
             booksSkipped.append((book, e))
-
-        print '\tCreating X-Ray file'
-        mainWindow['Edit1'].SetEditText(book.bookLocation)
-        mainWindow['Edit2'].SetEditText(book.shelfariURL)
-        mainWindow['Button6'].Click()   #make sure Source is Shelfari
-        mainWindow['Button11'].Click()  #click create xray button
-
-        #wait for aliases window
-        aliasesWindow.Wait('exists', timeout=60)
-        aliasesWindow['No'].Click()
-
-        #wait for chapters window
-        chaptersWindow.Wait('exists', timeout=60)
-        chaptersWindow['No'].Click()
-
-        #wait for xray creation to be done
-        app.WaitCPUUsageLower(timeout=60)
 
     #close X-Ray Builder GUI
     app.kill_()
 
     #move x-ray files to their respective locations
-    print 'Moving X-Ray Files to their directories'
     xrayFiles = []
     for dirName, subDirList, fileList in os.walk(outputDir):
         for file in glob(os.path.join(dirName,'*.asc')):
             print file
             xrayFiles.append(file)
-    
+    if len(xrayFiles)> 0:
+        print 'Moving X-Ray Files to their directories'
     for xrayFile in xrayFiles:
         xrayLoc = kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[2]).xrayLocation
         if xrayLoc and os.path.exists(xrayLoc):
             move(xrayFile, xrayLoc)
 
+    if len(booksUpdated) > 0:
+        print 'Books Updated: '
+    for book in booksUpdated:
+        print '\t%s' % book.bookNameAndAuthor
+    print
+    if len(booksSkipped) > 0:
+        print 'Books Skipped: '
     for book in booksSkipped:
-        print '%s skipped because %s' % (book[0].bookName, book[1])
+        print '%s skipped because %s' % (book[0].bookNameAndAuthor, book[1])
 
     #clean up
     #delete dmp, ext, log,  out

@@ -3,6 +3,7 @@
 import ctypes
 import os
 from mobibook import MobiBook
+from customexceptions import *
 
 # Drive types
 DRIVE_UNKNOWN     = 0  # The drive type cannot be determined.
@@ -119,6 +120,3 @@ class Books(object):
             if (onlyCheckUpdated and book.update) or not onlyCheckUpdated:
                 if book.ASIN == ASIN:
                     return book
-
-class KindleNotFound(Exception):
-    pass

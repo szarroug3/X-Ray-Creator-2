@@ -7,6 +7,7 @@ import subprocess
 from google import search
 from bs4 import BeautifulSoup
 from mobi.mobi import Mobi
+from customexceptions import *
 
 class MobiBook(object):
     def __init__(self, filename):
@@ -147,9 +148,4 @@ class MobiBook(object):
                 if shelfari_bookID.isdigit():
                     self._shelfariURL = url
                     return
-        raise CouldNotFindShelfariURL('Could not find Shelfari URL for %s.' % self.bookFileName)
-
-class CouldNotFindASIN(Exception):
-    pass
-class CouldNotFindShelfariURL(Exception):
-    pass
+        raise CouldNotFindShelfariURL('Could not find Shelfari URL for %s.' % self.bookNameAndAuthor)
