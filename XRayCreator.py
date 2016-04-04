@@ -172,7 +172,6 @@ if len(booksToUpdate) > 0:
     xrayFiles = []
     for dirName, subDirList, fileList in os.walk(outputDir):
         for file in glob(os.path.join(dirName,'*.asc')):
-            print file
             xrayFiles.append(file)
     if len(xrayFiles)> 0:
         print 'Moving X-Ray Files to their directories'
