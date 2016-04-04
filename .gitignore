@@ -17,9 +17,13 @@ eggs/
 .eggs/
 lib/
 lib64/
+log/
+dmp/
+ext/
 parts/
 sdist/
 var/
+.google-cookie
 *.egg-info/
 .installed.cfg
 *.egg

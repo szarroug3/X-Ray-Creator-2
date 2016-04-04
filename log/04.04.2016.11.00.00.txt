@@ -1,3 +1,0 @@
-Running X-Ray Builder GUI v2.0.10.0. Log started on 04/04/2016 at 11:00:48.
-Extracting metadata...
-Error getting metadata: Destination array was not long enough. Check destIndex and length, and the array's lower bounds.
