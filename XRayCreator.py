@@ -34,7 +34,6 @@ def Update():
         elif pattern.match(bookID):
             bookRange = bookID.split('-')
             for bookNum in xrange(int(bookRange[0]), int(bookRange[1])+1):
-                print bookNum
                 book = kindleBooks.books[int(bookNum) - 1]
                 MarkForUpdate(book)
                 if book.xrayExists:
