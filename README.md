@@ -4,6 +4,7 @@
 Acknowledgements
 ======================
 Original X-Ray Builder by Ephemerality (http://www.mobileread.com/forums/showthread.php?t=245754)
+
 Original Mobi Metadata Editor By Gluggy (http://www.mobileread.com/forums/showthread.php?t=165729)
 
 Requirements:
