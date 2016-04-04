@@ -39,11 +39,6 @@ def New():
 def MarkForUpdate(book):    
     book.update = True
 
-def CleanUp():
-    if os.path.exists('dmp'): rmtree('dmp')
-    if os.path.exists('ext'): rmtree('ext')
-    if os.path.exists('log'): rmtree('log')
-    if os.path.exists('out'): rmtree('out')
 
 #main
 parser = argparse.ArgumentParser(description='Create and update kindle X-Ray files')
@@ -94,6 +89,7 @@ if len(booksToUpdate) > 0:
     mainWindow['Button3'].Click()
     settingsWindow.Wait('exists', timeout=60)
     outputDir = settingsWindow['Edit4'].Texts()[0]
+    if os.path.exists(outputDir): rmtree(outputDir)
     settingsWindow['Button23'].Click()
 
     #update books
@@ -147,6 +143,9 @@ else:
 #clean up
 #delete dmp, ext, log,  out
 print "Cleaning up..."
-CleanUp()
+if os.path.exists(outputDir): rmtree(outputDir)
+if os.path.exists('dmp'): rmtree('dmp')
+if os.path.exists('ext'): rmtree('ext')
+if os.path.exists('log'): rmtree('log')
 
 print "Done!"
