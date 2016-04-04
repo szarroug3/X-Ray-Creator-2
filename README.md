@@ -1,18 +1,19 @@
 # X-Ray-Creator-2
 =============
+
 Acknowledgements
---------------------------
+======================
 Original X-Ray Builder by Ephemerality (http://www.mobileread.com/forums/showthread.php?t=245754)
 Original Mobi Metadata Editor By Gluggy (http://www.mobileread.com/forums/showthread.php?t=165729)
 
 Requirements:
---------------------------
+======================
 	* Python packages: Google, Pywinauto
 	* You must open X-Ray Builder GUI at least once to close out the one time dialog box
 	  that pops up; You should also go and set the settings
 
 Usage
---------------------------
+======================
 usage: XRayCreator.py [-h] [-u] [-ua] [-n]
 
 Create and update kindle X-Ray files
