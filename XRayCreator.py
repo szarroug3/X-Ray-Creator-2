@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import re
 from kindle.books import Books
 from time import sleep
 from glob import glob
@@ -21,13 +22,24 @@ def Update():
     books = raw_input("Please enter book number(s) of the book(s) you'd like to update in a comma separated list: ")
     books = books.replace(" ", "")
     books = books.split(',')
+    pattern = re.compile("([0-9]+[-][0-9]+)")
     for bookID in books:
-        if  int(bookID) <= len(kindleBooks):
-            book = kindleBooks.books[int(bookID) - 1]
-            MarkForUpdate(book)
-            if book.xrayExists:
-                for xrayFile in glob(os.path.join(book.xrayLocation, '*.asc')):
-                    os.remove(xrayFile)
+        if bookID.isdigit():
+            if  int(bookID) <= len(kindleBooks):
+                book = kindleBooks.books[int(bookID) - 1]
+                MarkForUpdate(book)
+                if book.xrayExists:
+                    for xrayFile in glob(os.path.join(book.xrayLocation, '*.asc')):
+                        os.remove(xrayFile)
+        elif pattern.match(bookID):
+            bookRange = bookID.split('-')
+            for bookNum in xrange(int(bookRange[0]), int(bookRange[1])+1):
+                print bookNum
+                book = kindleBooks.books[int(bookNum) - 1]
+                MarkForUpdate(book)
+                if book.xrayExists:
+                    for xrayFile in glob(os.path.join(book.xrayLocation, '*.asc')):
+                        os.remove(xrayFile)
         else:
             print "Skipping book number %s as it is not in the list." % bookID
 
@@ -42,7 +54,7 @@ def MarkForUpdate(book):
 
 #main
 parser = argparse.ArgumentParser(description='Create and update kindle X-Ray files')
-parser.add_argument('-u', '--update', action='store_true', help='Will give you a list of all books on kindle and asks you to return a list of book numbers for the books you want to update')
+parser.add_argument('-u', '--update', action='store_true', help='Will give you a list of all books on kindle and asks you to return a comma separated list of book numbers for the books you want to update; Note: You can use a range in the list')
 parser.add_argument('-ua', '--updateall', action='store_true',  help='Deletes all X-Ray files and recreates them. Will also create X-Ray files for books that don\'t already have one')
 parser.add_argument('-n', '--new', action='store_true', help='Creates X-Ray files for books that don\'t already have one')
 args = parser.parse_args()
@@ -133,19 +145,19 @@ if len(booksToUpdate) > 0:
 
     for book in booksSkipped:
         print '%s skipped because %s' % (book[0].bookName, book[1])
+
+    #clean up
+    #delete dmp, ext, log,  out
+    print "Cleaning up..."
+    if os.path.exists(outputDir): rmtree(outputDir)
+    if os.path.exists('dmp'): rmtree('dmp')
+    if os.path.exists('ext'): rmtree('ext')
+    if os.path.exists('log'): rmtree('log')
+    if os.path.exists('.google-cookie'): os.remove('.google-cookie')
+    if os.path.exists(os.path.join('X-Ray Builder GUI', 'log')): rmtree(os.path.join('X-Ray Builder GUI', 'log'))
+    if os.path.exists(os.path.join('X-Ray Builder GUI', 'out')): rmtree(os.path.join('X-Ray Builder GUI', 'out'))
 else:
     print "No books to update."
 
-#clean up
-#delete dmp, ext, log,  out
-print "Cleaning up..."
-if os.path.exists(outputDir): rmtree(outputDir)
-if os.path.exists('dmp'): rmtree('dmp')
-if os.path.exists('ext'): rmtree('ext')
-if os.path.exists('log'): rmtree('log')
-if os.path.exists('.google-cookie'): os.remove('.google-cookie')
-#if os.path.exists(os.path.join('X-Ray Builder GUI', 'dmp')): rmtree(os.path.join('X-Ray Builder GUI', 'dmp'))
-if os.path.exists(os.path.join('X-Ray Builder GUI', 'log')): rmtree(os.path.join('X-Ray Builder GUI', 'log'))
-if os.path.exists(os.path.join('X-Ray Builder GUI', 'out')): rmtree(os.path.join('X-Ray Builder GUI', 'out'))
 
 print "Done!"

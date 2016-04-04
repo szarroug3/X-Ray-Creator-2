@@ -21,11 +21,13 @@ Create and update kindle X-Ray files
 optional arguments:
 	-h, --help		show this help message and exit
   
-	-u, --update		Will give you a list of all books on kindle and asks you
-  
-						to return a list of book numbers for the books you want to
-                    
-						update
+	-u, --update		Will give you a list of all books on kindle and asks you 
+
+						to return a comma separated list of book numbers for the
+
+						books you want to update; Note: You can use a range in the
+
+						list
                     
 	-ua, --updateall	Deletes all X-Ray files and recreates them. Will also
   
