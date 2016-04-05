@@ -49,7 +49,7 @@ def MarkForUpdate(book, checkForXRay=True):
             os.remove(xrayFile)
 
 def SetupXRayBuilder():
-    #create global variables
+    # create global variables
     global booksUpdated, booksSkipped, app, mainWindow, aliasesWindow, chaptersWindow, settingsWindow
     global xrayButton, sheflariURLButton, shelfariButton, aliasesNoButton, chaptersNoButton
     global bookTextBox, shelfariURLTextBox, outputTextBox, outputDir
@@ -57,14 +57,14 @@ def SetupXRayBuilder():
     booksUpdated = []
     booksSkipped = []
 
-    #open X-Ray Builder GUI
+    # open X-Ray Builder GUI
     app = Application().start(os.path.join('X-Ray Builder GUI','X-Ray Builder GUI.exe'))
     mainWindow = app['X-Ray Builder GUI']
     aliasesWindow = app['Aliases']
     chaptersWindow = app['Chapters']
     settingsWindow = app['Settings']
 
-    #get buttons
+    # get buttons
     buttons = [button for button in mainWindow._ctrl_identifiers() if type(button) is controls.win32_controls.ButtonWrapper]
     buttons.sort(key=lambda x:x.Rectangle().left)
     xrayButton = buttons[6]
@@ -75,27 +75,27 @@ def SetupXRayBuilder():
     aliasesNoButton = aliasesWindow['No']
     chaptersNoButton = chaptersWindow['No']
 
-    #get text boxes
+    # get text boxes
     textBoxes = [box for box in mainWindow._ctrl_identifiers() if type(box) is controls.win32_controls.EditWrapper]
     textBoxes.sort(key=lambda x:x.Rectangle().top)
     bookTextBox = textBoxes[0]
     shelfariURLTextBox = textBoxes[1]
     outputTextBox = textBoxes[2]
 
-    #minimize window
-    #mainWindow.Minimize()
+    # minimize window
+    # mainWindow.Minimize()
 
-    #Get output directory
+    # Get output directory
     ClickButton(settingsButton)
     settingsWindow.Wait('exists', timeout=60)
     outputDir = settingsWindow['Output Directory:Edit'].Texts()[0]
     ClickButton(settingsSaveButton)
     app.WaitCPUUsageLower(threshold=.5, timeout=300)
     
-    #make sure Source is Shelfari
+    # make sure Source is Shelfari
     ClickButton(shelfariButton)
 
-    #make sure output directory is empty
+    # make sure output directory is empty
     if os.path.exists(outputDir): rmtree(outputDir)
     os.mkdir(outputDir)
 
@@ -118,7 +118,7 @@ def ProgressBar(percentage, processingText='Processing'):
 def UpdateASINAndUrl(books):
     aConn = httplib.HTTPConnection('ajax.googleapis.com')
     sConn = httplib.HTTPConnection('www.shelfari.com')
-    #get and update shelfari url
+    # get and update shelfari url
     print 'Updating ASINs and getting shelfari URLs'
     ProgressBar(0, processingText='Processing %s' % books[0].bookNameAndAuthor)
     for progress, book in enumerate(books, start=1):
@@ -127,23 +127,23 @@ def UpdateASINAndUrl(books):
     print
 
 def CreateXRayFile(book):
-    ClickButton(xrayButton) #click create xray button
+    ClickButton(xrayButton) # click create xray button
 
-    #wait for aliases window and respond
+    # wait for aliases window and respond
     app.WaitCPUUsageLower(threshold=.5, timeout=300)
     aliasesWindow.Wait('exists', timeout=30)
     ClickButton(aliasesNoButton)
 
-    #wait for chapters window and respond
+    # wait for chapters window and respond
     app.WaitCPUUsageLower(threshold=.5, timeout=300)
     chaptersWindow.Wait('exists', timeout=5)
     ClickButton(chaptersNoButton)
 
-    #wait for xray creation to be done
+    # wait for xray creation to be done
     app.WaitCPUUsageLower(threshold=.5, timeout=300)
 
 def MoveXRayFiles(booksUpdate):
-    #move x-ray files to their respective locations
+    # move x-ray files to their respective locations
     xrayFiles = []
     for dirName, subDirList, fileList in os.walk(outputDir):
         for file in glob(os.path.join(dirName,'*.asc')):
@@ -160,14 +160,14 @@ def MoveXRayFiles(booksUpdate):
 
 #--------------------------------------------------------------------------------------------------------------------------END OF FUNCTIONS--------------------------------------------------------------------------------------------------------------------------#
 
-#main
+# main
 parser = argparse.ArgumentParser(description='Create and update kindle X-Ray files')
 parser.add_argument('-u', '--update', action='store_true', help='Will give you a list of all books on kindle and asks you to return a comma separated list of book numbers for the books you want to update; Note: You can use a range in the list')
 parser.add_argument('-ua', '--updateall', action='store_true',  help='Deletes all X-Ray files and recreates them. Will also create X-Ray files for books that don\'t already have one')
 parser.add_argument('-n', '--new', action='store_true', help='Creates X-Ray files for books that don\'t already have one')
 args = parser.parse_args()
 
-#check to make sure only one argument is chosen
+# check to make sure only one argument is chosen
 numOfArgs = 0
 if args.updateall: numOfArgs += 1
 if args.update: numOfArgs += 1
@@ -188,24 +188,24 @@ elif args.new:
 
 booksToUpdate = kindleBooks.GetBooksToUpdate()
 if len(booksToUpdate) > 0:
-    #update books' ASIN and get shelfari urls, run setup
+    # update books' ASIN and get shelfari urls, run setup
     UpdateASINAndUrl(booksToUpdate)
     SetupXRayBuilder()
     print 'Creating X-Ray Files'
     for book in booksToUpdate:
         try:
-            #insert book location
+            # insert book location
             print '\t%s' % book.bookNameAndAuthor
             EditTextBox(bookTextBox, book.bookLocation)
 
             if book.shelfariURL:
                 EditTextBox(shelfariURLTextBox, book.shelfariURL)
 
-                #create xray file and add to updated list
+                # create xray file and add to updated list
                 CreateXRayFile(book)
                 booksUpdated.append(book)
             else:
-                #clear shelfari url, click shelfari button and wait for it to finish
+                # clear shelfari url, click shelfari button and wait for it to finish
                 EditTextBox(bookTextBox, '')
                 ClickButton(sheflariURLButton)
                 app.WaitCPUUsageLower(threshold=.5, timeout=300)
@@ -217,19 +217,19 @@ if len(booksToUpdate) > 0:
         except Exception, e:
             booksSkipped.append((book, e))
 
-    #close X-Ray Builder GUI
+    # close X-Ray Builder GUI
     app.kill_()
 
     MoveXRayFiles(booksUpdated)
 
-    #print updated books
+    # print updated books
     print
     if len(booksUpdated) > 0:
         print 'Books Updated: '
     for book in booksUpdated:
         print '\t%s' % book.bookNameAndAuthor
 
-    #print skipped books
+    # print skipped books
     print
     if len(booksSkipped) > 0:
         print 'Books Skipped: '

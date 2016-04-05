@@ -129,11 +129,11 @@ class MobiBook(object):
 
     # Update ASIN in book using mobi2mobi
     def UpdateASIN(self):
-        #remove extra file if it exists
+        # remove extra file if it exists
         if os.path.exists(self.bookLocation + '_NEW'):
             os.remove(self.bookLocation + '_NEW')
 
-        #create new file with updated ASIN
+        # create new file with updated ASIN
         mobi2mobi_path = os.path.join(os.path.dirname(__file__), 'MobiPerl', 'mobi2mobi.exe')
         subprocess.Popen([mobi2mobi_path,
             self.bookLocation,
@@ -143,7 +143,7 @@ class MobiBook(object):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
 
         sleep(1)
-        #remove old file, rename new file to old filename
+        # remove old file, rename new file to old filename
         os.remove(self.bookLocation)
         os.rename(self.bookLocation + '_NEW', self.bookLocation)
 
