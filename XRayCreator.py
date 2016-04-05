@@ -108,18 +108,20 @@ def EditTextBox(textBox, text):
         sleep(1)
     textBox.SetEditText(text)
 
-def ProgressBar(percentage):
+def ProgressBar(percentage, processingText='Processing'):
     progressBar = '#' * (percentage / 5)
-    sys.stdout.write('\r\tProcessing |%-20s| %i%%' % (progressBar, percentage))
+    perc = str(percentage) + '%'
+    sys.stdout.write('\r%-4s |%-20s| %s' % (perc, progressBar, processingText))
     sys.stdout.flush()
 
 def UpdateASINAndUrl(books):
     #get and update shelfari url
-    print 'Updating ASIN and getting shelfari URL'
-    ProgressBar(0)
+    print 'Updating ASINs and getting shelfari URLs'
+    #ProgressBar(0, processingText='Processing %s' % books[0].bookNameAndAuthor)
     for progress, book in enumerate(books, start=1):
+        print book.bookNameAndAuthor
         book.GetShelfariURL()
-        ProgressBar(progress*100/len(books))
+        #ProgressBar(progress*100/len(books), processingText = 'Processing %s' % book.bookNameAndAuthor)
     print
 
 def CreateXRayFile(book):

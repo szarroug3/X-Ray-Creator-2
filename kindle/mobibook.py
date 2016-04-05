@@ -2,7 +2,8 @@
 
 import os
 from glob import glob
-from urllib import urlopen, urlencode
+from urllib import urlencode
+from urllib2 import urlopen
 import subprocess
 import json
 from bs4 import BeautifulSoup
@@ -104,10 +105,15 @@ class MobiBook(object):
  
     # Get ASIN from Amazon
     def GetASIN(self):
-        self._ASIN = -1
-        query = urlencode ({'q': 'amazon kindle \"ebook\" ' + self.bookNameAndAuthor})
-        response = urlopen('http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query).read()
-        jsonPage = json.loads(response)
+        self._ASIN = None
+        query = urlencode ({'q': 'amazon kindle ebook ' + self.bookNameAndAuthor})
+        for i in xrange(5):
+            response = urlopen('http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query)
+            if response.getcode() != 200:
+                print response.info()
+            response = response.read()
+            jsonPage = json.loads(response)
+            if jsonPage: break
         results = jsonPage['responseData']['results']
         for result in results:
             url = result['url']
@@ -152,13 +158,13 @@ class MobiBook(object):
         if updateASIN:
             self.GetASIN()
             self.UpdateASIN()
-        response = urlopen ( 'http://www.shelfari.com/search/books?Keywords=' + self.ASIN ).read()
-        page_source = BeautifulSoup(response, 'html.parser')
-        for link in page_source.find_all('a'):
-            url = link.get('href')
-            if 'http://www.shelfari.com/books/' in url and url.count('/') == 5:
-                shelfari_bookID = url[30:url[30:].find('/') + 30]
-                if shelfari_bookID.isdigit():
-                    self._shelfariURL = url
-                    return
-        self._shelfariURL = None
+        # response = urlopen('http://www.shelfari.com/search/books?Keywords=' + self.ASIN).read()
+        # page_source = BeautifulSoup(response, 'html.parser')
+        # for link in page_source.find_all('a'):
+        #     url = link.get('href')
+        #     if 'http://www.shelfari.com/books/' in url and url.count('/') == 5:
+        #         shelfari_bookID = url[30:url[30:].find('/') + 30]
+        #         if shelfari_bookID.isdigit():
+        #             self._shelfariURL = url
+        #             return
+        # self._shelfariURL = None
