@@ -4,6 +4,7 @@ import os
 import sys
 import argparse
 import re
+import httplib
 from kindle.books import Books
 from kindle.customexceptions import *
 from time import sleep
@@ -115,12 +116,13 @@ def ProgressBar(percentage, processingText='Processing'):
     sys.stdout.flush()
 
 def UpdateASINAndUrl(books):
+    conn = httplib.HTTPConnection('ajax.googleapis.com')
     #get and update shelfari url
     print 'Updating ASINs and getting shelfari URLs'
     #ProgressBar(0, processingText='Processing %s' % books[0].bookNameAndAuthor)
     for progress, book in enumerate(books, start=1):
         print book.bookNameAndAuthor
-        book.GetShelfariURL()
+        book.GetShelfariURL(connection=conn)
         #ProgressBar(progress*100/len(books), processingText = 'Processing %s' % book.bookNameAndAuthor)
     print
 

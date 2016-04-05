@@ -6,6 +6,7 @@ from urllib import urlencode
 from urllib2 import urlopen
 import subprocess
 import json
+import httplib
 from bs4 import BeautifulSoup
 from mobi.mobi import Mobi
 from customexceptions import *
@@ -104,16 +105,14 @@ class MobiBook(object):
             self._bookNameAndAuthor = self.bookFileName
  
     # Get ASIN from Amazon
-    def GetASIN(self):
+    def GetASIN(self, connection=None):
         self._ASIN = None
+        if not connection:
+            connection = httplib.HTTPConnection('ajax.googleapis.com')
         query = urlencode ({'q': 'amazon kindle ebook ' + self.bookNameAndAuthor})
-        for i in xrange(5):
-            response = urlopen('http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query)
-            if response.getcode() != 200:
-                print response.info()
-            response = response.read()
-            jsonPage = json.loads(response)
-            if jsonPage: break
+        connection.request('GET', '/ajax/services/search/web?v=1.0&' + query)
+        response = connection.getresponse().read()
+        jsonPage = json.loads(response)
         results = jsonPage['responseData']['results']
         for result in results:
             url = result['url']
@@ -154,7 +153,7 @@ class MobiBook(object):
         os.rename(self.bookLocation + '_NEW', self.bookLocation)
 
     # Searches for shelfari url for book
-    def GetShelfariURL(self, updateASIN=True):
+    def GetShelfariURL(self, updateASIN=True, connection=None):
         if updateASIN:
             self.GetASIN()
             self.UpdateASIN()
