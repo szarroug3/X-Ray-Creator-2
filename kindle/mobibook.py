@@ -4,7 +4,7 @@ import os
 from glob import glob
 from urllib import urlopen, urlencode
 import subprocess
-from google import search
+import json
 from bs4 import BeautifulSoup
 from mobi.mobi import Mobi
 from customexceptions import *
@@ -19,7 +19,7 @@ class MobiBook(object):
     def __str__(self):
         string = self.bookNameAndAuthor
         if self.update:
-            string += "\n\tMarked for update"
+            string += '\n\tMarked for update'
         string +='\n\t%s' % self.bookLocation
         if not self.xrayExists: string += '\n\tNo',
         else: string += '\n\t'
@@ -40,7 +40,7 @@ class MobiBook(object):
             if os.path.exists(filename):
                 self._bookLocation = os.path.abspath(filename)
                 self._bookFileName = os.path.splitext(os.path.basename(self.bookLocation))[0]
-                self._xrayLocation = os.path.join(os.path.dirname(self.bookLocation), self.bookFileName + ".sdr")
+                self._xrayLocation = os.path.join(os.path.dirname(self.bookLocation), self.bookFileName + '.sdr')
                 self._xrayExists = glob(os.path.join(self.xrayLocation, '*.asc'))
             else:
                 raise FileNotFoundError('File %s not found' % filename)
@@ -105,14 +105,27 @@ class MobiBook(object):
     # Get ASIN from Amazon
     def GetASIN(self):
         self._ASIN = -1
-        query = 'amazon kindle \"ebook\" %s' % self.bookNameAndAuthor
-        for url in search(query, stop=5):
+        query = urlencode ({'q': 'amazon kindle \"ebook\" ' + self.bookNameAndAuthor})
+        response = urlopen('http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query).read()
+        jsonPage = json.loads(response)
+        results = jsonPage['responseData']['results']
+        for result in results:
+            url = result['url']
             if "amazon" in url:
                 if "/dp/" in url:
                     index = url.find("/dp/")
                     ASIN = url[index + 4 : index + 14]
                     self._ASIN = ASIN
                     return
+                else:
+                    for i in xrange(10):
+                        amazon_page = urlopen(url)
+                        page_source = amazon_page.read()
+                        index = page_source.find("ASIN.0")
+                        if index > 0:
+                            ASIN = page_source[index + 15 : index + 25]
+                            self._ASIN = ASIN
+                            return
         raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookFileName)
 
     # Update ASIN in book using mobi2mobi
@@ -132,7 +145,7 @@ class MobiBook(object):
 
         #remove old file, rename new file to old filename
         os.remove(self.bookLocation)
-        os.rename(self.bookLocation + "_NEW", self.bookLocation)
+        os.rename(self.bookLocation + '_NEW', self.bookLocation)
 
     # Searches for shelfari url for book
     def GetShelfariURL(self, updateASIN=True):
@@ -140,12 +153,12 @@ class MobiBook(object):
             self.GetASIN()
             self.UpdateASIN()
         response = urlopen ( 'http://www.shelfari.com/search/books?Keywords=' + self.ASIN ).read()
-        page_source = BeautifulSoup(response, "html.parser")
-        for link in page_source.find_all("a"):
+        page_source = BeautifulSoup(response, 'html.parser')
+        for link in page_source.find_all('a'):
             url = link.get('href')
-            if "http://www.shelfari.com/books/" in url and url.count('/') == 5:
+            if 'http://www.shelfari.com/books/' in url and url.count('/') == 5:
                 shelfari_bookID = url[30:url[30:].find('/') + 30]
                 if shelfari_bookID.isdigit():
                     self._shelfariURL = url
                     return
-        raise CouldNotFindShelfariURL('Could not find Shelfari URL for %s.' % self.bookNameAndAuthor)
+        self._shelfariURL = None

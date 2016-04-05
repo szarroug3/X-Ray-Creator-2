@@ -9,7 +9,7 @@ Original Mobi Metadata Editor By Gluggy (http://www.mobileread.com/forums/showth
 
 Requirements:
 ======================
-	* Python packages: Google, Pywinauto
+	* Python packages: Pywinauto
 	* You must open X-Ray Builder GUI at least once to close out the one time dialog box
 	  that pops up; You should also go and set the settings
 

@@ -52,18 +52,18 @@ class Books(object):
     
     # Return drive letter of kindle if found or None if not found
     def FindKindle(self):
-        print "Checking for kindle..."
+        print 'Checking for kindle...'
         drive_info = self.GetDriveInfo()
         removable_drives = [drive_letter for drive_letter, drive_type in drive_info if drive_type == DRIVE_REMOVABLE]
         for drive in removable_drives:
             for dirName, subDirList, fileList in os.walk(drive):
-                if dirName == drive + "system\.mrch":
+                if dirName == drive + 'system\.mrch':
                     for fName in fileList:
-                        if "amzn1_account" in fName:
-                            print "Kindle found!"
+                        if 'amzn1_account' in fName:
+                            print 'Kindle found!'
                             self.kindleDrive = drive
                             return
-        raise KindleNotFound("Please make sure kindle is plugged in.")
+        raise KindleNotFound('Please make sure kindle is plugged in.')
 
     # Return list of tuples mapping drive letters to drive types
     def GetDriveInfo(self):
@@ -82,10 +82,10 @@ class Books(object):
         books_directory = os.path.join(self.kindleDrive, 'documents')
         self.books = []
         index = 0
-        print "Searching for books..."
+        print 'Searching for books...'
         for dirName, subDirList, fileList in os.walk(books_directory):
             for fName in fileList:
-                if ".mobi" in fName:
+                if '.mobi' in fName:
                     index += 1
                     self.books.append(MobiBook(os.path.join(dirName,fName)))
         print '%i books found.' % index
@@ -95,7 +95,7 @@ class Books(object):
         for book in self.books:
             book.GetBookConfig()
         self.books.sort(key=lambda x:x.bookNameAndAuthor)
-        print "Done getting metadata"
+        print 'Done getting metadata'
         print
 
     def PrintListOfBooks(self):

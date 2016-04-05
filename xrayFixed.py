@@ -19,10 +19,10 @@ def UpdateAll():
 
 def Update():
     kindleBooks.PrintListOfBooks()
-    books = raw_input('Please enter book number(s) of the book(s) you\'d like to update in a comma separated list: ')
-    books = books.replace(' ', '')
+    books = raw_input("Please enter book number(s) of the book(s) you'd like to update in a comma separated list: ")
+    books = books.replace(" ", "")
     books = books.split(',')
-    pattern = re.compile('([0-9]+[-][0-9]+)')
+    pattern = re.compile("([0-9]+[-][0-9]+)")
     for bookID in books:
         if bookID.isdigit():
             if  int(bookID) <= len(kindleBooks):
@@ -34,7 +34,7 @@ def Update():
                 book = kindleBooks.books[int(bookNum) - 1]
                 MarkForUpdate(book)
         else:
-            print 'Skipping book number %s as it is not in the list.' % bookID
+            print "Skipping book number %s as it is not in the list." % bookID
 
 def New():
     for book in kindleBooks:
@@ -48,50 +48,45 @@ def MarkForUpdate(book, checkForXRay=True):
             os.remove(xrayFile)
 
 def SetupXRayBuilder():
-    #create global variables
-    global booksUpdated, booksSkipped, app, mainWindow, aliasesWindow, chaptersWindow, settingsWindow
-    global xrayButton, sheflariURLButton, shelfariButton, aliasesNoButton, chaptersNoButton
-    global bookTextBox, shelfariURLTextBox, outputTextBox, outputDir
-
-    booksUpdated = []
-    booksSkipped = []
+	booksUpdated = []
+    global booksSkipped = []
 
     #open X-Ray Builder GUI
-    app = Application().start(os.path.join('X-Ray Builder GUI','X-Ray Builder GUI.exe'))
-    mainWindow = app['X-Ray Builder GUI']
-    aliasesWindow = app['Aliases']
-    chaptersWindow = app['Chapters']
-    settingsWindow = app['Settings']
+    global app = Application().start(os.path.join('X-Ray Builder GUI','X-Ray Builder GUI.exe'))
+    global mainWindow = app['X-Ray Builder GUI']
+    global aliasesWindow = app['Aliases']
+    global chaptersWindow = app['Chapters']
+    global settingsWindow = app['Settings']
 
     #get buttons
     buttons = [button for button in mainWindow._ctrl_identifiers() if type(button) is controls.win32_controls.ButtonWrapper]
     buttons.sort(key=lambda x:x.Rectangle().left)
-    xrayButton = buttons[6]
-    sheflariURLButton = buttons[2]
+    global xrayButton = buttons[6]
+    global sheflariURLButton = buttons[2]
     settingsButton = buttons[10]
     settingsSaveButton = settingsWindow['SaveButton']
-    shelfariButton = mainWindow['ShelfariButton']
-    aliasesNoButton = aliasesWindow['No']
-    chaptersNoButton = chaptersWindow['No']
+    global shelfariButton = mainWindow['ShelfariButton']
+    global aliasesNoButton = aliasesWindow['No']
+    global chaptersNoButton = chaptersWindow['No']
 
     #get text boxes
     textBoxes = [box for box in mainWindow._ctrl_identifiers() if type(box) is controls.win32_controls.EditWrapper]
     textBoxes.sort(key=lambda x:x.Rectangle().top)
-    bookTextBox = textBoxes[0]
-    shelfariURLTextBox = textBoxes[1]
-    outputTextBox = textBoxes[2]
+    global bookTextBox = textBoxes[0]
+    global shelfariURLTextBox = textBoxes[1]
+    global outputTextBox = textBoxes[2]
 
     #minimize window
     #mainWindow.Minimize()
 
     #Get output directory
-    ClickButton(settingsButton)
+    ClickButton(settinsButton)
     settingsWindow.Wait('exists', timeout=60)
-    outputDir = settingsWindow['Output Directory:Edit'].Texts()[0]
+    global outputDir = settingsWindow['Output Directory:Edit'].Texts()[0]
     ClickButton(settingsSaveButton)
     app.WaitCPUUsageLower(threshold=.5, timeout=300)
-    
-    #make sure Source is Shelfari
+	
+	#make sure Source is Shelfari
     ClickButton(shelfariButton)
 
     #make sure output directory is empty
@@ -99,36 +94,23 @@ def SetupXRayBuilder():
     os.mkdir(outputDir)
 
 def ClickButton(button):
-    while not button.IsEnabled():
+	while not button.IsEnabled():
         sleep(1)
     button.Click()
 
 def EditTextBox(textBox, text):
-    while not textBox.IsEnabled():
+	while not textBox.IsEnabled():
         sleep(1)
     textBox.SetEditText(text)
 
-def ProgressBar(percentage):
-    progressBar = '#' * (percentage / 5)
-    sys.stdout.write('\r\tProcessing |%-20s| %i%%' % (progressBar, percentage))
-    sys.stdout.flush()
-
-def UpdateASINAndUrl(books):
-    #get and update shelfari url
-    print 'Updating ASIN and getting shelfari URL'
-    ProgressBar(0)
-    for progress, book in enumerate(books, start=1):
-        book.GetShelfariURL()
-        ProgressBar(progress*100/len(books))
-    print
-
 def CreateXRayFile(book):
+    print '\tCreating X-Ray file'
     ClickButton(xrayButton) #click create xray button
 
     #wait for aliases window and respond
     app.WaitCPUUsageLower(threshold=.5, timeout=300)
     aliasesWindow.Wait('exists', timeout=30)
-    ClickButton(aliasesNoButton)
+	ClickButton(aliasesNoButton)
 
     #wait for chapters window and respond
     app.WaitCPUUsageLower(threshold=.5, timeout=300)
@@ -138,8 +120,8 @@ def CreateXRayFile(book):
     #wait for xray creation to be done
     app.WaitCPUUsageLower(threshold=.5, timeout=300)
 
-def MoveXRayFiles(booksUpdate):
-    #move x-ray files to their respective locations
+def MoveXRayFiles(booksUpdate)
+	#move x-ray files to their respective locations
     xrayFiles = []
     for dirName, subDirList, fileList in os.walk(outputDir):
         for file in glob(os.path.join(dirName,'*.asc')):
@@ -184,33 +166,43 @@ elif args.new:
 
 booksToUpdate = kindleBooks.GetBooksToUpdate()
 if len(booksToUpdate) > 0:
-    #update books' ASIN and get shelfari urls, run setup
-    UpdateASINAndUrl(booksToUpdate)
-    SetupXRayBuilder()
-    print 'Creating X-Ray Files'
+	#update books
     for book in booksToUpdate:
         try:
             #insert book location
-            print '\t%s' % book.bookNameAndAuthor
+            print book.bookNameAndAuthor
             EditTextBox(bookTextBox, book.bookLocation)
 
-            if book.shelfariURL:
-                EditTextBox(shelfariURLTextBox, book.shelfariURL)
+            #get and update shelfari url
+            print '\tUpdating ASIN and getting shelfari URL'
+            book.GetShelfariURL()
+            EditTextBox(shelfariURLTextBox, book.shelfariURL)
 
-                #create xray file and add to updated list
-                CreateXRayFile(book)
-                booksUpdated.append(book)
-            else:
+        	#create xray file and add to updated list
+            CreateXRayFile(book)
+            print '\tCreated X-Ray File'
+            booksUpdated.append(book)
+        except CouldNotFindShelfariURL:
+            try:
+                print '\tMaking X-Ray Builder GUI get shelfari URL'
                 #clear shelfari url, click shelfari button and wait for it to finish
-                EditTextBox(bookTextBox, '')
+            	EditTextBox(bookTextBox, '')
                 ClickButton(sheflariURLButton)
                 app.WaitCPUUsageLower(threshold=.5, timeout=300)
+
+                #check if shelfari url is updated
                 if shelfariURLTextBox.Texts()[0]:
                     CreateXRayFile(book)
+                    print '\tCreated X-Ray File'
                     booksUpdated.append(book)
                 else:
+                	print '\tSkipping book because could not find shelfari url'
                     booksSkipped.append((book, 'could not find shelfari url.'))
+            except Exception, e:
+                print '\tSkipping book because %s' % e
+                booksSkipped.append((book, e))
         except Exception, e:
+            print '\tSkipping book because %s' % e
             booksSkipped.append((book, e))
 
     #close X-Ray Builder GUI
@@ -219,7 +211,7 @@ if len(booksToUpdate) > 0:
     MoveXRayFiles(booksUpdated)
 
     #print updated books
-    print
+ 	print
     if len(booksUpdated) > 0:
         print 'Books Updated: '
     for book in booksUpdated:
@@ -235,6 +227,6 @@ if len(booksToUpdate) > 0:
         else:
             print '%s skipped because %s' % (book[0].bookNameAndAuthor, repr(book[1]))
 else:
-    print 'No books to update.'
+    print "No books to update."
 
-print 'Done!'
+print "Done!"
