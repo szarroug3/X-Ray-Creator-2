@@ -1,17 +1,23 @@
 # MobiBook.py
 
 import os
+import sys
 from glob import glob
 from urllib import urlencode
 from urllib2 import urlopen
 import subprocess
 import json
 import httplib
+import re
+from time import sleep
 from bs4 import BeautifulSoup
 from mobi.mobi import Mobi
 from customexceptions import *
 
 class MobiBook(object):
+    amazonURLPat = re.compile(r'.+amazon\.com/.+/dp/(.+)')
+    shelfariURLPat = re.compile(r'href="(.+/books/.+?)"')
+
     def __init__(self, filename):
         self.bookLocation = filename
         self.update = False
@@ -116,22 +122,10 @@ class MobiBook(object):
         results = jsonPage['responseData']['results']
         for result in results:
             url = result['url']
-            if "amazon" in url:
-                if "/dp/" in url:
-                    index = url.find("/dp/")
-                    ASIN = url[index + 4 : index + 14]
-                    self._ASIN = ASIN
-                    return
-                else:
-                    for i in xrange(10):
-                        amazon_page = urlopen(url)
-                        page_source = amazon_page.read()
-                        index = page_source.find("ASIN.0")
-                        if index > 0:
-                            ASIN = page_source[index + 15 : index + 25]
-                            self._ASIN = ASIN
-                            return
-        raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookFileName)
+            if self.amazonURLPat.match(url):
+                self._ASIN = self.amazonURLPat.search(url).group(1)
+                return
+        raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookNameAndAuthor)
 
     # Update ASIN in book using mobi2mobi
     def UpdateASIN(self):
@@ -146,24 +140,32 @@ class MobiBook(object):
             '--outfile', self.bookLocation + '_NEW',
             '--exthtype', 'asin',
             '--exthdata', self.ASIN],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
 
+        sleep(1)
         #remove old file, rename new file to old filename
         os.remove(self.bookLocation)
         os.rename(self.bookLocation + '_NEW', self.bookLocation)
 
     # Searches for shelfari url for book
-    def GetShelfariURL(self, updateASIN=True, connection=None):
+    def GetShelfariURL(self, updateASIN=True, aConnection=None, sConnection=None):
         if updateASIN:
-            self.GetASIN()
+            self.GetASIN(aConnection)
             self.UpdateASIN()
-        # response = urlopen('http://www.shelfari.com/search/books?Keywords=' + self.ASIN).read()
-        # page_source = BeautifulSoup(response, 'html.parser')
-        # for link in page_source.find_all('a'):
-        #     url = link.get('href')
-        #     if 'http://www.shelfari.com/books/' in url and url.count('/') == 5:
-        #         shelfari_bookID = url[30:url[30:].find('/') + 30]
-        #         if shelfari_bookID.isdigit():
-        #             self._shelfariURL = url
-        #             return
-        # self._shelfariURL = None
+        if not sConnection:
+            sConnection = httplib.HTTPConnection('www.shelfari.com')
+
+        query = urlencode ({'Keywords': self.ASIN})
+        sConnection.request('GET', '/search/books?' + query)
+        response = sConnection.getresponse().read()
+
+        # check to make sure there are results
+        if 'did not return any results' in response:
+            self._shelfariURL = None
+            return
+        urlsearch = self.shelfariURLPat.search(response)
+        if not urlsearch:
+            print 'in if'
+            self._shelfariURL = None
+            return
+        self._shelfariURL = urlsearch.group(1)
