@@ -126,10 +126,16 @@ class MobiBook(object):
         # if throttling, wait and try again
         while not jsonPage['responseData']:
             if timeout <= 0:
-                raise TimedOut("Timed out trying to get ASIN for %s" % book.bookNameAndAuthor)
+                raise TimedOut("Timed out trying to get ASIN for %s" % self.bookNameAndAuthor)
             sleep(30)
             connection.request('GET', '/ajax/services/search/web?v=1.0&' + query)
-            response = connection.getresponse().read()
+            try:
+                response = connection.getresponse().read()
+            except httplib.BadStatusLine:
+                connection.close()
+                connection = httplib.HTTPConnection('ajax.googleapis.com')
+                connection.request('GET', '/ajax/services/search/web?v=1.0&' + query)
+                response = connection.getresponse().read()
             jsonPage = json.loads(response)
             timeout -= 30
 
@@ -138,7 +144,7 @@ class MobiBook(object):
             url = result['url']
             if self.amazonURLPat.match(url):
                 self._ASIN = self.amazonURLPat.search(url).group(1)
-                return
+                return connection
         raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookNameAndAuthor)
 
     # Update ASIN in book using mobi2mobi
@@ -148,21 +154,14 @@ class MobiBook(object):
             os.remove(self.bookLocation + '_NEW')
 
         # create new file with updated ASIN
-        mobi2mobi_path = os.path.join(os.path.dirname(__file__), 'MobiPerl', 'mobi2mobi.exe')
-        if 'Elantris' in self.bookNameAndAuthor:
+        with open(os.devnull, 'w') as fNull:
+            mobi2mobi_path = os.path.join(os.path.dirname(__file__), 'MobiPerl', 'mobi2mobi.exe')
             subprocess.Popen([mobi2mobi_path,
-            self.bookLocation,
-            '--outfile', self.bookLocation + '_NEW',
-            '--exthtype', 'asin',
-            '--exthdata', self.ASIN]).wait()
-            print self.bookLocation
-        else:
-            subprocess.Popen([mobi2mobi_path,
-            self.bookLocation,
-            '--outfile', self.bookLocation + '_NEW',
-            '--exthtype', 'asin',
-            '--exthdata', self.ASIN],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
+                self.bookLocation,
+                '--outfile', self.bookLocation + '_NEW',
+                '--exthtype', 'asin',
+                '--exthdata', self.ASIN],
+                stdout=fNull, stderr=fNull).communicate()
 
         # wait to make sure OS knows file is created
         sleep(1)
@@ -171,23 +170,30 @@ class MobiBook(object):
         os.rename(self.bookLocation + '_NEW', self.bookLocation)
 
     # Searches for shelfari url for book
-    def GetShelfariURL(self, updateASIN=True, aConnection=None, sConnection=None):
+    def GetShelfariURL(self, updateASIN=True, aConnection=None, sConnection=None,):
         if updateASIN:
             self.GetASIN(aConnection)
-            self.UpdateASIN()
+            aConnection = self.UpdateASIN()
         if not sConnection:
             sConnection = httplib.HTTPConnection('www.shelfari.com')
 
         query = urlencode ({'Keywords': self.ASIN})
         sConnection.request('GET', '/search/books?' + query)
-        response = sConnection.getresponse().read()
-
+        try:
+            response = sConnection.getresponse().read()
+        except httplib.BadStatusLine:
+            sConnection.close()
+            sConnection = httplib.HTTPConnection('www.shelfari.com')
+            sConnection.request('GET', '/search/books?' + query)
+            response = sConnection.getresponse().read()
+        
         # check to make sure there are results
         if 'did not return any results' in response:
             self._shelfariURL = None
-            return
+            return [aConnection, sConnection]
         urlsearch = self.shelfariURLPat.search(response)
         if not urlsearch:
             self._shelfariURL = None
-            return
+            return [aConnection, sConnection]
         self._shelfariURL = urlsearch.group(1)
+        return [aConnection, sConnection]

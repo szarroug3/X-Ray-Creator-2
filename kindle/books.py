@@ -88,7 +88,7 @@ class Books(object):
                 if '.mobi' in fName:
                     index += 1
                     self.books.append(MobiBook(os.path.join(dirName,fName)))
-        print '%i books found.' % index
+        print '%i books found' % index
 
 
         print 'Get metadata for books...'

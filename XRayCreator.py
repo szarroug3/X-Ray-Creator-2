@@ -13,7 +13,7 @@ from shutil import move, rmtree
 from pywinauto import *
 
 #--------------------------------------------------------------------------------------------------------------------------END OF IMPORTS--------------------------------------------------------------------------------------------------------------------------#
-MAX_LINE_LENGTH = 80
+MAX_LINE_LENGTH = 60
 
 def UpdateAll():
     for book in kindleBooks:
@@ -41,22 +41,26 @@ def Update():
 def New():
     for book in kindleBooks:
          if not book.xrayExists:
-            MarkForUpdate(book, checkForXRay=False)
+            MarkForUpdate(book)
 
-def MarkForUpdate(book, checkForXRay=True):    
+def MarkForUpdate(book, checkForXRay=False):    
     book.update = True
-    if checkForXRay and book.xrayExists:
+    if checkForXRay:
+        RemoveXRay(book)
+
+def UnmarkforUpdate(book):
+    book.update = False
+
+def RemoveXRay(book):
+    if book.xrayExists:
         for xrayFile in glob(os.path.join(book.xrayLocation, '*.asc')):
             os.remove(xrayFile)
 
 def SetupXRayBuilder():
     # create global variables
-    global booksUpdated, booksSkipped, app, mainWindow, aliasesWindow, chaptersWindow, settingsWindow
+    global app, mainWindow, aliasesWindow, chaptersWindow, settingsWindow
     global xrayButton, sheflariURLButton, shelfariButton, aliasesNoButton, chaptersNoButton
     global bookTextBox, shelfariURLTextBox, outputTextBox, outputDir
-
-    booksUpdated = []
-    booksSkipped = []
 
     # open X-Ray Builder GUI
     app = Application().start(os.path.join('X-Ray Builder GUI','X-Ray Builder GUI.exe'))
@@ -112,11 +116,12 @@ def EditTextBox(textBox, text):
 
 def ProgressBar(percentage, processingText='Processing'):
     progressBar = '#' * (percentage / 5)
-
-    # check if 
-    if len(processingText) + 26 > MAX_LINE_LENGTH: processingText = processingText[:MAX_LINE_LENGTH-30] + '...'
     perc = str(percentage) + '%'
-    sys.stdout.write('\r\033[K')  # clear line
+
+    # check if line is too long and shorten accordingly
+    if len(processingText) + 28 > MAX_LINE_LENGTH: processingText = processingText[:MAX_LINE_LENGTH-31] + '...'
+
+    sys.stdout.write('\r%s\r' % ('\0'*MAX_LINE_LENGTH)) # clear line
     sys.stdout.write('%-4s |%-20s| %s' % (perc, progressBar, processingText))
     sys.stdout.flush()
 
@@ -127,8 +132,15 @@ def UpdateASINAndUrl(books):
     # get and update shelfari url
     print 'Updating ASINs and getting shelfari URLs'
     for progress, book in enumerate(books):
-        ProgressBar(progress*100/len(books), processingText = 'Processing %s' % book.bookNameAndAuthor)
-        book.GetShelfariURL(aConnection=aConn, sConnection=sConn)
+        ProgressBar(progress*100/len(books), processingText = book.bookNameAndAuthor)
+        try:
+            aConn, sConn = book.GetShelfariURL(aConnection=aConn, sConnection=sConn)
+        except Exception as e:
+            booksSkipped.append((book, e))
+            if type(e) is CouldNotFindASIN:
+                print 'in'
+                UnmarkforUpdate(book)
+
 
         # throttling requests to google to make sure we don't exceed limit
         sleep(5)
@@ -161,7 +173,9 @@ def MoveXRayFiles(booksUpdate):
         print 'Moving X-Ray Files to their directories'
 
     for xrayFile in xrayFiles:
-        xrayLoc = kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[2]).xrayLocation
+        book = kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[2]).xrayLocation
+        xrayLoc = book.xrayLocation
+        RemoveXRay(book)
         if xrayLoc and os.path.exists(xrayLoc):
             move(xrayFile, xrayLoc)
 
@@ -207,6 +221,9 @@ elif args.new:
 
 booksToUpdate = kindleBooks.GetBooksToUpdate()
 if len(booksToUpdate) > 0:
+    global booksUpdated, booksSkipped
+    booksUpdated = []
+    booksSkipped = []
     # update books' ASIN and get shelfari urls, run setup
     UpdateASINAndUrl(booksToUpdate)
     SetupXRayBuilder()
