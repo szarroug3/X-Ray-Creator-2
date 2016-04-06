@@ -13,6 +13,7 @@ from shutil import move, rmtree
 from pywinauto import *
 
 #--------------------------------------------------------------------------------------------------------------------------END OF IMPORTS--------------------------------------------------------------------------------------------------------------------------#
+MAX_LINE_LENGTH = 80
 
 def UpdateAll():
     for book in kindleBooks:
@@ -111,20 +112,27 @@ def EditTextBox(textBox, text):
 
 def ProgressBar(percentage, processingText='Processing'):
     progressBar = '#' * (percentage / 5)
+
+    # check if 
+    if len(processingText) + 26 > MAX_LINE_LENGTH: processingText = processingText[:MAX_LINE_LENGTH-30] + '...'
     perc = str(percentage) + '%'
-    sys.stdout.write('\r%-4s |%-20s| %s' % (perc, progressBar, processingText))
+    sys.stdout.write('\r\033[K')  # clear line
+    sys.stdout.write('%-4s |%-20s| %s' % (perc, progressBar, processingText))
     sys.stdout.flush()
 
 def UpdateASINAndUrl(books):
     aConn = httplib.HTTPConnection('ajax.googleapis.com')
     sConn = httplib.HTTPConnection('www.shelfari.com')
+
     # get and update shelfari url
     print 'Updating ASINs and getting shelfari URLs'
-    ProgressBar(0, processingText='Processing %s' % books[0].bookNameAndAuthor)
-    for progress, book in enumerate(books, start=1):
-        book.GetShelfariURL(aConnection=aConn, sConnection=sConn)
+    for progress, book in enumerate(books):
         ProgressBar(progress*100/len(books), processingText = 'Processing %s' % book.bookNameAndAuthor)
-    print
+        book.GetShelfariURL(aConnection=aConn, sConnection=sConn)
+
+        # throttling requests to google to make sure we don't exceed limit
+        sleep(5)
+    ProgressBar(100, processingText='Done.\n\n')
 
 def CreateXRayFile(book):
     ClickButton(xrayButton) # click create xray button
@@ -156,6 +164,17 @@ def MoveXRayFiles(booksUpdate):
         xrayLoc = kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[2]).xrayLocation
         if xrayLoc and os.path.exists(xrayLoc):
             move(xrayFile, xrayLoc)
+
+def CleanUp():
+    # delete dmp, ext, log,  out
+    print "Cleaning up..."
+    if os.path.exists(outputDir): rmtree(outputDir)
+    if os.path.exists('dmp'): rmtree('dmp')
+    if os.path.exists('ext'): rmtree('ext')
+    if os.path.exists('log'): rmtree('log')
+    if os.path.exists(os.path.join('X-Ray Builder GUI', 'dmp')): rmtree(os.path.join('X-Ray Builder GUI', 'dmp'))
+    if os.path.exists(os.path.join('X-Ray Builder GUI', 'log')): rmtree(os.path.join('X-Ray Builder GUI', 'log'))
+    if os.path.exists(os.path.join('X-Ray Builder GUI', 'out')): rmtree(os.path.join('X-Ray Builder GUI', 'out'))
 
 
 #--------------------------------------------------------------------------------------------------------------------------END OF FUNCTIONS--------------------------------------------------------------------------------------------------------------------------#
@@ -238,6 +257,8 @@ if len(booksToUpdate) > 0:
             print '%s skipped because %s' % (book[0].bookNameAndAuthor, book[1])
         else:
             print '%s skipped because %s' % (book[0].bookNameAndAuthor, repr(book[1]))
+
+    CleanUp()
 else:
     print 'No books to update.'
 

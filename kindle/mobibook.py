@@ -29,7 +29,7 @@ class MobiBook(object):
         if self.update:
             string += '\n\tMarked for update'
         string +='\n\t%s' % self.bookLocation
-        if not self.xrayExists: string += '\n\tNo',
+        if not self.xrayExists: string += str('\n\tNo')
         else: string += '\n\t'
         string += ' X-Ray found at %s' % self.xrayLocation
         if self.ASIN:
@@ -45,13 +45,14 @@ class MobiBook(object):
     @bookLocation.setter
     def bookLocation(self, filename):
         if type(filename) == str:
+            if filename[:-1] == '\n': filename = filename[:-1]
             if os.path.exists(filename):
                 self._bookLocation = os.path.abspath(filename)
                 self._bookFileName = os.path.splitext(os.path.basename(self.bookLocation))[0]
                 self._xrayLocation = os.path.join(os.path.dirname(self.bookLocation), self.bookFileName + '.sdr')
                 self._xrayExists = glob(os.path.join(self.xrayLocation, '*.asc'))
             else:
-                raise FileNotFoundError('File %s not found' % filename)
+                raise FileNotFound('File %s not found' % filename)
         else:
             raise TypeError('Expected string, got ' + str(type(filename)))
 
@@ -106,12 +107,14 @@ class MobiBook(object):
         self._author = self.bookConfig['exth']['records'][100]
         self._bookName = self.bookConfig['mobi']['Full Name']
         if self._author and self.bookName:
+            if self.author[:-1] == '\n': self._author = self.author[:-1]
+            if self.bookName[:-1] == '\n': self._bookName = self.bookName[:-1]
             self._bookNameAndAuthor = '%s - %s' % (self.author, self.bookName)
         else:
             self._bookNameAndAuthor = self.bookFileName
  
     # Get ASIN from Amazon
-    def GetASIN(self, connection=None):
+    def GetASIN(self, connection=None, timeout=300):
         self._ASIN = None
         if not connection:
             connection = httplib.HTTPConnection('ajax.googleapis.com')
@@ -119,6 +122,17 @@ class MobiBook(object):
         connection.request('GET', '/ajax/services/search/web?v=1.0&' + query)
         response = connection.getresponse().read()
         jsonPage = json.loads(response)
+
+        # if throttling, wait and try again
+        while not jsonPage['responseData']:
+            if timeout <= 0:
+                raise TimedOut("Timed out trying to get ASIN for %s" % book.bookNameAndAuthor)
+            sleep(30)
+            connection.request('GET', '/ajax/services/search/web?v=1.0&' + query)
+            response = connection.getresponse().read()
+            jsonPage = json.loads(response)
+            timeout -= 30
+
         results = jsonPage['responseData']['results']
         for result in results:
             url = result['url']
@@ -135,13 +149,22 @@ class MobiBook(object):
 
         # create new file with updated ASIN
         mobi2mobi_path = os.path.join(os.path.dirname(__file__), 'MobiPerl', 'mobi2mobi.exe')
-        subprocess.Popen([mobi2mobi_path,
+        if 'Elantris' in self.bookNameAndAuthor:
+            subprocess.Popen([mobi2mobi_path,
+            self.bookLocation,
+            '--outfile', self.bookLocation + '_NEW',
+            '--exthtype', 'asin',
+            '--exthdata', self.ASIN]).wait()
+            print self.bookLocation
+        else:
+            subprocess.Popen([mobi2mobi_path,
             self.bookLocation,
             '--outfile', self.bookLocation + '_NEW',
             '--exthtype', 'asin',
             '--exthdata', self.ASIN],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
 
+        # wait to make sure OS knows file is created
         sleep(1)
         # remove old file, rename new file to old filename
         os.remove(self.bookLocation)
@@ -165,7 +188,6 @@ class MobiBook(object):
             return
         urlsearch = self.shelfariURLPat.search(response)
         if not urlsearch:
-            print 'in if'
             self._shelfariURL = None
             return
         self._shelfariURL = urlsearch.group(1)
