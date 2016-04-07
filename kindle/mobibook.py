@@ -4,9 +4,7 @@ import os
 import sys
 from glob import glob
 from urllib import urlencode
-from urllib2 import urlopen
 import subprocess
-import json
 import httplib
 import re
 from time import sleep
@@ -15,7 +13,7 @@ from mobi.mobi import Mobi
 from customexceptions import *
 
 class MobiBook(object):
-    amazonURLPat = re.compile(r'www\.amazon\.com\/.+\/dp\/([a-zA-Z0-9]+)')
+    amazonASINPat = re.compile(r'data\-asin=\"([a-zA-z0-9]+)\"')
     shelfariURLPat = re.compile(r'href="(.+/books/.+?)"')
     headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain", "User-Agent": "Mozilla/5.0"}
 
@@ -118,6 +116,7 @@ class MobiBook(object):
         self._ASIN = None
         if not connection:
             connection = httplib.HTTPConnection('www.amazon.com')
+
         query = urlencode ({'field-keywords': self.bookNameAndAuthor})
         connection.request('GET', '/s/ref=nb_sb_noss_2?url=node%3D154606011&' + query, None, self.headers)
         try:
@@ -128,13 +127,18 @@ class MobiBook(object):
             connection.request('GET', '/s/ref=nb_sb_noss_2?url=node%3D154606011&' + query, None, self.headers)
             response = connection.getresponse().read()
         # check to make sure there are results
-        if 'did not match any products' in response and not 'Did you mean:' in response:
+        if 'did not match any products' in response and not 'Did you mean:' in response and not 'so we searched in All Departments' in response:
             raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookNameAndAuthor)
-        urlsearch = self.amazonURLPat.search(response)
-        if not urlsearch:
-            raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookNameAndAuthor)
-        self._ASIN = urlsearch.group(1)
-        return connection
+        soup = BeautifulSoup(response, 'html.parser')
+        results = soup.find_all('div', {'id': 'centerPlus'})
+        results.append(soup.find_all('div', {'id': 'resultsCol'}))
+        for r in results:
+            if 'Buy now with 1-Click' in str(r):
+                asinSearch = self.amazonASINPat.search(str(r))
+                if asinSearch:
+                    self._ASIN = asinSearch.group(1)
+                    return connection
+        raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookNameAndAuthor)
 
     # Update ASIN in book using mobi2mobi
     def UpdateASIN(self):
@@ -159,10 +163,10 @@ class MobiBook(object):
         os.rename(self.bookLocation + '_NEW', self.bookLocation)
 
     # Searches for shelfari url for book
-    def GetShelfariURL(self, updateASIN=True, aConnection=None, sConnection=None,):
+    def GetShelfariURL(self, updateASIN=True, aConnection=None, sConnection=None):
         if updateASIN:
-            self.GetASIN(connection=aConnection)
-            aConnection = self.UpdateASIN()
+            aConnection = self.GetASIN(connection=aConnection)
+            self.UpdateASIN()
         if not sConnection:
             sConnection = httplib.HTTPConnection('www.shelfari.com')
 

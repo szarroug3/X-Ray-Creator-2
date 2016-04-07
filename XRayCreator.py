@@ -131,7 +131,15 @@ def ClickButton(button):
 def EditTextBox(textBox, text):
     while not textBox.IsEnabled():
         sleep(1)
+    numOfTries = 10
     textBox.SetEditText(text)
+    while textBox.Texts()[0] != text and numOfTries > 0:
+        textBox.SetEditText(text)
+        numOfTries -= 1
+    
+    if textBox.Texts()[0] == text:
+        return
+    raise CouldNotEditTextBox('could not edit text box to %s' % text)
 
 def ProgressBar(percentage, processingText='Processing'):
     progressBar = '#' * (percentage / 5)

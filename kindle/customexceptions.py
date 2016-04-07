@@ -10,3 +10,5 @@ class FileNotFound(Exception):
     pass
 class TimedOut(Exception):
 	pass
+class CouldNotEditTextBox(Exception):
+	pass
