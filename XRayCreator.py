@@ -72,8 +72,8 @@ def UnmarkforUpdate(book):
 
 def RemoveXRay(book):
     if book.xrayExists:
-        for xrayFile in glob(os.path.join(book.xrayLocation, '*.asc')):
-            os.remove(xrayFile)
+        for file in glob(os.path.join(book.xrayLocation, '*')):
+            os.remove(file)
 
 def SetupXRayBuilder():
     # create global variables
@@ -136,7 +136,7 @@ def EditTextBox(textBox, text):
     while textBox.Texts()[0] != text and numOfTries > 0:
         textBox.SetEditText(text)
         numOfTries -= 1
-    
+
     if textBox.Texts()[0] == text:
         return
     raise CouldNotEditTextBox('could not edit text box to %s' % text)
@@ -273,6 +273,7 @@ if len(booksToUpdate) > 0:
                     booksSkipped.append((book, 'could not find shelfari url.'))
         except Exception, e:
             booksSkipped.append((book, e))
+    print
 
     # close X-Ray Builder GUI
     killed = False
@@ -282,7 +283,8 @@ if len(booksToUpdate) > 0:
             killed = app.kill_()
         except:
             numOfTries -= 1
-    if not killed: print "Could not close X-Ray Builder GUI."
+    if not killed:
+        print "Could not close X-Ray Builder GUI."
 
     MoveXRayFiles(booksUpdated)
 
