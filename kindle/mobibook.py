@@ -15,8 +15,9 @@ from mobi.mobi import Mobi
 from customexceptions import *
 
 class MobiBook(object):
-    amazonURLPat = re.compile(r'.+amazon\.com/.+/dp/(.+)')
+    amazonURLPat = re.compile(r'www\.amazon\.com\/.+\/dp\/([a-zA-Z0-9]+)')
     shelfariURLPat = re.compile(r'href="(.+/books/.+?)"')
+    headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain", "User-Agent": "Mozilla/5.0"}
 
     def __init__(self, filename):
         self.bookLocation = filename
@@ -112,40 +113,28 @@ class MobiBook(object):
             self._bookNameAndAuthor = '%s - %s' % (self.author, self.bookName)
         else:
             self._bookNameAndAuthor = self.bookFileName
- 
-    # Get ASIN from Amazon
-    def GetASIN(self, connection=None, timeout=300):
+
+    def GetASIN(self, connection=None):
         self._ASIN = None
         if not connection:
-            connection = httplib.HTTPConnection('ajax.googleapis.com')
-        query = urlencode ({'q': 'amazon kindle ebook ' + self.bookNameAndAuthor})
-        connection.request('GET', '/ajax/services/search/web?v=1.0&' + query)
-        response = connection.getresponse().read()
-        jsonPage = json.loads(response)
-
-        # if throttling, wait and try again
-        while not jsonPage['responseData']:
-            if timeout <= 0:
-                raise TimedOut("Timed out trying to get ASIN for %s" % self.bookNameAndAuthor)
-            sleep(30)
-            connection.request('GET', '/ajax/services/search/web?v=1.0&' + query)
-            try:
-                response = connection.getresponse().read()
-            except httplib.BadStatusLine:
-                connection.close()
-                connection = httplib.HTTPConnection('ajax.googleapis.com')
-                connection.request('GET', '/ajax/services/search/web?v=1.0&' + query)
-                response = connection.getresponse().read()
-            jsonPage = json.loads(response)
-            timeout -= 30
-
-        results = jsonPage['responseData']['results']
-        for result in results:
-            url = result['url']
-            if self.amazonURLPat.match(url):
-                self._ASIN = self.amazonURLPat.search(url).group(1)
-                return connection
-        raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookNameAndAuthor)
+            connection = httplib.HTTPConnection('www.amazon.com')
+        query = urlencode ({'field-keywords': self.bookNameAndAuthor})
+        connection.request('GET', '/s/ref=nb_sb_noss_2?url=node%3D154606011&' + query, None, self.headers)
+        try:
+            response = connection.getresponse().read()
+        except httplib.BadStatusLine:
+            connection.close()
+            connection = httplib.HTTPConnection('www.amazon.com')
+            connection.request('GET', '/s/ref=nb_sb_noss_2?url=node%3D154606011&' + query, None, self.headers)
+            response = connection.getresponse().read()
+        # check to make sure there are results
+        if 'did not match any products' in response and not 'Did you mean:' in response:
+            raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookNameAndAuthor)
+        urlsearch = self.amazonURLPat.search(response)
+        if not urlsearch:
+            raise CouldNotFindASIN('Could not find ASIN for %s' % self.bookNameAndAuthor)
+        self._ASIN = urlsearch.group(1)
+        return connection
 
     # Update ASIN in book using mobi2mobi
     def UpdateASIN(self):
@@ -172,28 +161,30 @@ class MobiBook(object):
     # Searches for shelfari url for book
     def GetShelfariURL(self, updateASIN=True, aConnection=None, sConnection=None,):
         if updateASIN:
-            self.GetASIN(aConnection)
+            self.GetASIN(connection=aConnection)
             aConnection = self.UpdateASIN()
         if not sConnection:
             sConnection = httplib.HTTPConnection('www.shelfari.com')
 
-        query = urlencode ({'Keywords': self.ASIN})
-        sConnection.request('GET', '/search/books?' + query)
-        try:
-            response = sConnection.getresponse().read()
-        except httplib.BadStatusLine:
-            sConnection.close()
-            sConnection = httplib.HTTPConnection('www.shelfari.com')
+        if self.ASIN:
+            query = urlencode ({'Keywords': self.ASIN})
             sConnection.request('GET', '/search/books?' + query)
-            response = sConnection.getresponse().read()
-        
-        # check to make sure there are results
-        if 'did not return any results' in response:
-            self._shelfariURL = None
+            try:
+                response = sConnection.getresponse().read()
+            except httplib.BadStatusLine:
+                sConnection.close()
+                sConnection = httplib.HTTPConnection('www.shelfari.com')
+                sConnection.request('GET', '/search/books?' + query)
+                response = sConnection.getresponse().read()
+            
+            # check to make sure there are results
+            if 'did not return any results' in response:
+                self._shelfariURL = None
+                return [aConnection, sConnection]
+            urlsearch = self.shelfariURLPat.search(response)
+            if not urlsearch:
+                self._shelfariURL = None
+                return [aConnection, sConnection]
+            self._shelfariURL = urlsearch.group(1)
             return [aConnection, sConnection]
-        urlsearch = self.shelfariURLPat.search(response)
-        if not urlsearch:
-            self._shelfariURL = None
-            return [aConnection, sConnection]
-        self._shelfariURL = urlsearch.group(1)
-        return [aConnection, sConnection]
+        raise CouldNotFindASIN('ASIN not set for %s' % self.bookNameAndAuthor)

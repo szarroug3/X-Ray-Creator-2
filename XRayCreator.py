@@ -32,7 +32,26 @@ def Update():
                 MarkForUpdate(book)
         elif pattern.match(bookID):
             bookRange = bookID.split('-')
-            for bookNum in xrange(int(bookRange[0]), int(bookRange[1])+1):
+            rangeA = int(bookRange[0])
+            rangeB = int(bookRange[1])
+            if rangeA > rangeB:
+                print 'Numbers are reversed. Will start with %s and end with %s' % (rangeB, rangeA)
+                temp = rangeA
+                rangeA = rangeB
+                rangeB = temp
+            if rangeA < 1:
+                print '%i is less than 1. Will start with 1.' % rangeA
+                rangeA = 1
+            if rangeA > len(kindleBooks):
+                print '%i is more than %s. Will start with %s.' % (rangeA, len(kindleBooks), len(kindleBooks))
+                rangeA = len(kindleBooks)
+            if rangeB > len(kindleBooks):
+                print '%i is more than %s. Will end with %s.' % (rangeB, len(kindleBooks), len(kindleBooks))
+                rangeB = len(kindleBooks)
+            if rangeB < 1:
+                print '%i is less than 1. Will end with 1.' % rangeB
+                rangeB = 1
+            for bookNum in xrange(rangeA, rangeB+1):
                 book = kindleBooks.books[int(bookNum) - 1]
                 MarkForUpdate(book)
         else:
@@ -126,7 +145,7 @@ def ProgressBar(percentage, processingText='Processing'):
     sys.stdout.flush()
 
 def UpdateASINAndUrl(books):
-    aConn = httplib.HTTPConnection('ajax.googleapis.com')
+    aConn = httplib.HTTPConnection('www.amazon.com')
     sConn = httplib.HTTPConnection('www.shelfari.com')
 
     # get and update shelfari url
@@ -138,12 +157,7 @@ def UpdateASINAndUrl(books):
         except Exception as e:
             booksSkipped.append((book, e))
             if type(e) is CouldNotFindASIN:
-                print 'in'
                 UnmarkforUpdate(book)
-
-
-        # throttling requests to google to make sure we don't exceed limit
-        sleep(5)
     ProgressBar(100, processingText='Done.\n\n')
 
 def CreateXRayFile(book):
@@ -173,7 +187,7 @@ def MoveXRayFiles(booksUpdate):
         print 'Moving X-Ray Files to their directories'
 
     for xrayFile in xrayFiles:
-        book = kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[2]).xrayLocation
+        book = kindleBooks.GetBookByASIN(os.path.basename(xrayFile).split('.')[2])
         xrayLoc = book.xrayLocation
         RemoveXRay(book)
         if xrayLoc and os.path.exists(xrayLoc):
@@ -189,7 +203,6 @@ def CleanUp():
     if os.path.exists(os.path.join('X-Ray Builder GUI', 'dmp')): rmtree(os.path.join('X-Ray Builder GUI', 'dmp'))
     if os.path.exists(os.path.join('X-Ray Builder GUI', 'log')): rmtree(os.path.join('X-Ray Builder GUI', 'log'))
     if os.path.exists(os.path.join('X-Ray Builder GUI', 'out')): rmtree(os.path.join('X-Ray Builder GUI', 'out'))
-
 
 #--------------------------------------------------------------------------------------------------------------------------END OF FUNCTIONS--------------------------------------------------------------------------------------------------------------------------#
 
@@ -254,7 +267,14 @@ if len(booksToUpdate) > 0:
             booksSkipped.append((book, e))
 
     # close X-Ray Builder GUI
-    app.kill_()
+    killed = False
+    numOfTries = 10
+    while not killed and numOfTries > 0:
+        try:
+            killed = app.kill_()
+        except:
+            numOfTries -= 1
+    if not killed: print "Could not close X-Ray Builder GUI."
 
     MoveXRayFiles(booksUpdated)
 
@@ -270,10 +290,10 @@ if len(booksToUpdate) > 0:
     if len(booksSkipped) > 0:
         print 'Books Skipped: '
     for book in booksSkipped:
-        if book[1]:
-            print '%s skipped because %s' % (book[0].bookNameAndAuthor, book[1])
-        else:
+        if book[1] is '':
             print '%s skipped because %s' % (book[0].bookNameAndAuthor, repr(book[1]))
+        else:
+            print '%s skipped because %s' % (book[0].bookNameAndAuthor, book[1])
 
     CleanUp()
 else:
